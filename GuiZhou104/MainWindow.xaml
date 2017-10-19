@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:GuiZhou104"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+    <StackPanel>
+        <TextBlock Name="tb"/>
+        <Button Content="test" Click="Button_Click"/>
+    </StackPanel>
 </Window>

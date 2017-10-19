@@ -61,7 +61,7 @@ namespace Shouyuan.IEC104
         public byte Cause
         {
             get => (byte)(COT[0] & 0x3f);
-            set => COT[0] = (byte)(COT[0] & 0xc0 + value & 0x3f);
+            set => COT[0] = (byte)((COT[0] & 0xc0) + (value & 0x3f));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Shouyuan.IEC104
         /// </summary>
         public bool Test
         {
-            get => (COT[0] | 0x80) != 0;
+            get => (COT[0] & 0x80) != 0;
             set => COT[0] = (byte)(value ? COT[0] | 0X80 : COT[0] & ~0X80);
         }
 
@@ -78,7 +78,7 @@ namespace Shouyuan.IEC104
         /// </summary>
         public bool PN
         {
-            get => (COT[0] | 0x40) != 0;
+            get => (COT[0] & 0x40) != 0;
             set => COT[0] = (byte)(value ? COT[0] | 0X40 : COT[0] & ~0X40);
         }
     }

@@ -26,6 +26,7 @@ namespace Shouyuan.IEC104
         /// </summary>
         public byte[] TimeStamp;
 
-
+        public byte Length { get =>(byte)( Addr.Length + Element.Length + TimeStamp.Length); }
+            
     }
 }

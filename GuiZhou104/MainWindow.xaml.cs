@@ -25,5 +25,17 @@ namespace GuiZhou104
             InitializeComponent();
             
         }
+        ASDU ASDU=new ASDU();
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ASDU.COT[0] = 0;
+            ASDU.SQ = true;
+            ASDU.Cause = 0x39;
+            ASDU.Test = false;
+            ASDU.PN = true;
+            tb.Text = ASDU.COT[0].ToString("x");
+
+           
+        }
     }
 }
