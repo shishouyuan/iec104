@@ -25,5 +25,7 @@ namespace Shouyuan.IEC104
         /// 信息体时标。可选2、3、7个字节。
         /// </summary>
         public byte[] TimeStamp;
+
+
     }
 }
