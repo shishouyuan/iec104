@@ -43,6 +43,7 @@
     <Compile Include="APCI.cs" />
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="Slave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
