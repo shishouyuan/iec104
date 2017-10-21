@@ -28,8 +28,8 @@ namespace GuiZhou104
         ASDU ASDU=new ASDU();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var a = new Slave();
-            a.openPort();
+            var a = new Slave(2404,1);
+            a.startService();
 
            
         }

@@ -55,42 +55,70 @@ namespace Shouyuan.IEC104
         }
 
 
-        byte[,] bufs=new byte[10,260];
-        byte pbufi = 0, rbufi = 0;
-        byte rc = 0;
-      
 
+        byte rc = 0;
+
+        private void handleData(byte[] data)
+        {
+            Console.WriteLine(data);
+        }
 
         byte[] revBuf = new byte[260];
-        byte revBufi = 0;
+
+
         private void receiveMsg(Socket socket)
         {
+            byte len = 255;
+            byte[] cBuf = null;
             try
             {
                 while (socket != null)
                 {
                     int c = socket.Receive(revBuf);
-                    for (var i = 0; i < c; i++) {
-                        if (rc == 0 &&)
-                        {
-                            continue;
-                        }
-                        bufs[rbufi,rc] = revBuf[i];
-                        rc++;
-                        if (rc >= LEN)
-                        {
-                            bufs[rbufi][BUF_SIZE] = rc;
-                            rc = 0;
-                            if (bufs[rbufi][1] == addr1 && bufs[rbufi][2] == addr2)
-                            {
-                                rbufi = (rbufi + 1) % BUF_COUNT;
-                                newMsg = 1;
-                            }
 
+                    foreach (var i in revBuf)
+                    {
+                        if (rc == 0)
+                        {
+                            if (i != APCI.Header)
+                                continue;
+                            else
+                            {
+                                rc++;
+                            }
+                        }
+                        else if (rc == 1)
+                        {
+                            if (i > 0 && i <= 253)
+                            {
+                                len = (byte)(i + 2);
+                                cBuf = new byte[len];
+                                cBuf[0] = APCI.Header;
+                                cBuf[1] = i;
+                                rc++;
+                            }
+                            else
+                            {
+                                rc = 0;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            cBuf[rc] = i;
+                            rc++;
+                            if (rc >= len)
+                            {
+                                handleData(cBuf);
+                                rc = 0;
+                            }
                         }
                     }
                 }
+
+
             }
+            catch (Exception) { }
         }
 
         public void startService()
@@ -106,19 +134,6 @@ namespace Shouyuan.IEC104
                 });
         }
 
-        public void openPort()
-        {
-
-            var s = listenSocket.Accept();
-            var a = new byte[10];
-            while (s.Receive(a) > 0)
-            {
-                string sf = "";
-                foreach (var i in a)
-                    sf = sf + i.ToString("x");
-
-            }
-        }
 
     }
 }
