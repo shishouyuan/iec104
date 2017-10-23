@@ -60,7 +60,8 @@ namespace Shouyuan.IEC104
 
         private void handleData(byte[] data)
         {
-            Console.WriteLine(data);
+            foreach (var i in data)
+                Console.Write("{0},", i);
         }
 
         byte[] revBuf = new byte[260];
@@ -75,12 +76,13 @@ namespace Shouyuan.IEC104
                 while (socket != null)
                 {
                     int c = socket.Receive(revBuf);
-
-                    foreach (var i in revBuf)
+                    byte bi;
+                    for (int i = 0; i < c; i++)
                     {
+                        bi = revBuf[i];
                         if (rc == 0)
                         {
-                            if (i != APCI.Header)
+                            if (bi != APCI.Header)
                                 continue;
                             else
                             {
@@ -89,12 +91,12 @@ namespace Shouyuan.IEC104
                         }
                         else if (rc == 1)
                         {
-                            if (i > 0 && i <= 253)
+                            if (bi >=4 && bi <= 253)
                             {
-                                len = (byte)(i + 2);
+                                len = (byte)(bi + 2);
                                 cBuf = new byte[len];
                                 cBuf[0] = APCI.Header;
-                                cBuf[1] = i;
+                                cBuf[1] = bi;
                                 rc++;
                             }
                             else
@@ -105,7 +107,7 @@ namespace Shouyuan.IEC104
                         }
                         else
                         {
-                            cBuf[rc] = i;
+                            cBuf[rc] = bi;
                             rc++;
                             if (rc >= len)
                             {
@@ -123,6 +125,7 @@ namespace Shouyuan.IEC104
 
         public void startService()
         {
+            if (listenSocket != null) return;
             listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             listenSocket.Bind(new IPEndPoint(0, PortNumber));
             listenSocket.Listen(1);

@@ -13,5 +13,19 @@ namespace Shouyuan.IEC104
     {
         public APCI APCI { get; set; }
         public ASDU ASDU { get; set; }
+        
+    }
+
+    public class APDU_I : APDU
+    {
+
+    }
+    public class APDU_S : APDU
+    {
+
+    }
+    public class APDU_U : APDU
+    {
+
     }
 }

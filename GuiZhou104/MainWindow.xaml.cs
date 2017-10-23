@@ -26,10 +26,11 @@ namespace GuiZhou104
             
         }
         ASDU ASDU=new ASDU();
+        Slave s = new Slave(2404, 1);
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var a = new Slave(2404,1);
-            a.startService();
+            
+            s.startService();
 
            
         }
