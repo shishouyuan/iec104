@@ -11,6 +11,24 @@ namespace Shouyuan.IEC104
     /// </summary>
     public class ASDU
     {
+
+        public ASDU() { }
+
+        public ASDU(byte[] buf, int starti)
+        {
+
+            if (starti + 6 > buf.Length)
+                throw new Exception("ASDU传入数组过小");
+            Type = buf[starti + 0];
+            VarConstrain = buf[starti + 1];
+            COT[0] = buf[starti + 2];
+            COT[1] = buf[starti + 3];
+            Addr[0] = buf[starti + 4];
+            Addr[1] = buf[starti + 4];
+
+        }
+
+
         /// <summary>
         /// 类型标识。
         /// </summary>
@@ -74,12 +92,12 @@ namespace Shouyuan.IEC104
         }
 
         /// <summary>
-        /// 确认标志P/N，COT的次高位。
+        /// 确认标志P/N，COT的次高位，0为P返回True，1为N返回False。
         /// </summary>
         public bool PN
         {
-            get => (COT[0] & 0x40) != 0;
-            set => COT[0] = (byte)(value ? COT[0] | 0X40 : COT[0] & ~0X40);
+            get => (COT[0] & 0x40) == 0;
+            set => COT[0] = (byte)(value ? COT[0] & ~0X40 : COT[0] | 0X40);
         }
     }
 }

@@ -54,20 +54,23 @@ namespace Shouyuan.IEC104
             addr = ad;
         }
 
-
-
+        
         byte rc = 0;
 
-        private void handleData(byte[] data)
+        private void HandleData(byte[] data)
         {
-            foreach (var i in data)
-                Console.Write("{0},", i);
+            var a = new APCI(data);
+            try
+            {
+                var s = new ASDU(data, APCI.Length);
+            }
+            catch (Exception e) { }
         }
 
         byte[] revBuf = new byte[260];
 
 
-        private void receiveMsg(Socket socket)
+        private void ReceiveMsg(Socket socket)
         {
             byte len = 255;
             byte[] cBuf = null;
@@ -111,7 +114,7 @@ namespace Shouyuan.IEC104
                             rc++;
                             if (rc >= len)
                             {
-                                handleData(cBuf);
+                                HandleData(cBuf);
                                 rc = 0;
                             }
                         }
@@ -133,7 +136,7 @@ namespace Shouyuan.IEC104
                 (object o) =>
                 {
                     linkSocket = listenSocket.Accept();
-                    receiveMsg(linkSocket);
+                    ReceiveMsg(linkSocket);
                 });
         }
 
