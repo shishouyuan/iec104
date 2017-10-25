@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shouyuan.IEC104;
+
 namespace GuiZhou104
 {
     /// <summary>
@@ -23,16 +24,16 @@ namespace GuiZhou104
         public MainWindow()
         {
             InitializeComponent();
-            
+
         }
-        ASDU ASDU=new ASDU();
+        ASDU ASDU = new ASDU();
         Slave s = new Slave(2404, 1);
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            byte i = 0;
+            i = i.SetBit(8).SetBit(8).SetBit(8);
             s.startService();
 
-           
         }
     }
 }

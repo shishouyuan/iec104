@@ -54,7 +54,7 @@ namespace Shouyuan.IEC104
             addr = ad;
         }
 
-        
+
         byte rc = 0;
 
         private void HandleData(byte[] data)
@@ -94,7 +94,7 @@ namespace Shouyuan.IEC104
                         }
                         else if (rc == 1)
                         {
-                            if (bi >=4 && bi <= 253)
+                            if (bi >= 4 && bi <= 253)
                             {
                                 len = (byte)(bi + 2);
                                 cBuf = new byte[len];
@@ -123,7 +123,10 @@ namespace Shouyuan.IEC104
 
 
             }
-            catch (Exception) { }
+            catch (Exception e)
+            {
+                socket = null;
+            }
         }
 
         public void startService()
@@ -135,8 +138,11 @@ namespace Shouyuan.IEC104
             System.Threading.ThreadPool.QueueUserWorkItem(
                 (object o) =>
                 {
-                    linkSocket = listenSocket.Accept();
-                    ReceiveMsg(linkSocket);
+                    while (true)
+                    {
+                        linkSocket = listenSocket.Accept();
+                        ReceiveMsg(linkSocket);
+                    }
                 });
         }
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace Shouyuan.IEC104
 {
+
     /// <summary>
     /// 信息体对象
     /// </summary>
@@ -26,7 +26,6 @@ namespace Shouyuan.IEC104
         /// </summary>
         public byte[] TimeStamp;
 
-
         /// <summary>
         /// 信息体总长度。
         /// </summary>
@@ -35,9 +34,9 @@ namespace Shouyuan.IEC104
             get
             {
                 byte c = 0;
-                if (Addr != null) c +=(byte) Addr.Length;
+                if (Addr != null) c += (byte)Addr.Length;
                 if (Element != null) c += (byte)Element.Length;
-                if (TimeStamp != null) c += (byte)Element.Length;
+                if (TimeStamp != null) c += (byte)Element.Length;                
                 return c;
             }
         }
