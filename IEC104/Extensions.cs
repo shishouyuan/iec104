@@ -22,6 +22,11 @@ namespace Shouyuan.IEC104
         {
             return (byte)(v & ~(1 << i));
         }
+
+        public static byte Length(this ElementTypes t)
+        {
+            return Message.GetElementTypeLength(t);
+        }
     }
 
 }
