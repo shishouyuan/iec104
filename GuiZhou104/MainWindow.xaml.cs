@@ -16,6 +16,9 @@ using Shouyuan.IEC104;
 
 namespace GuiZhou104
 {
+   
+
+    
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -24,20 +27,36 @@ namespace GuiZhou104
         public MainWindow()
         {
             InitializeComponent();
+            APDU.Format = DatagramFormat.InformationTransmit;
+            var m0 = new Message(ElementTypes.NVA, 3, 1, 0);
+            m0.NVA = 0.23f;
+            APDU.SendingNumber = 0;
+            APDU.RecevingNumber = 10;
+            APDU.ASDU = ASDU;
+            ASDU.Messages.Add(m0);
+            ASDU.Address = 1;
+            ASDU.Cause = 3;
+            m0.Address = 1;
+            ASDU.Type =9;
 
         }
         ASDU ASDU = new ASDU();
+        APDU APDU = new APDU();
         Slave s = new Slave(2404, 1);
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             byte i = 0;
             i = i.SetBit(8).SetBit(8).SetBit(8);
             s.startService();
-            var m7 = new Message(ElementTypes.BCR, 1, 7);
-            var m2 = new Message(ElementTypes.BCR, 1, 2);
-            var m3 = new Message(ElementTypes.BCR, 1, 3);
-            var m1= new Message(ElementTypes.BCR, 1, 1);
-            var m0= new Message(ElementTypes.BCR, 1, 0);
+
+            try
+            {
+               // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
+               
+                APDU.SendTo(s.linkSocket);
+                
+            }
+            catch (Exception er) { }
 
         }
     }

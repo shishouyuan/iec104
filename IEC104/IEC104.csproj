@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APCI.cs" />
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
     <Compile Include="Extensions.cs" />

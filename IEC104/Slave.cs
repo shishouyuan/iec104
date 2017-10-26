@@ -14,7 +14,7 @@ namespace Shouyuan.IEC104
     public class Slave
     {
 
-        Socket listenSocket, linkSocket;
+        public Socket listenSocket, linkSocket;
 
         private int portNumber = 2404;
 
@@ -59,10 +59,10 @@ namespace Shouyuan.IEC104
 
         private void HandleData(byte[] data)
         {
-            var a = new APCI(data);
+            var a = new APDU(data);
             try
             {
-                var s = new ASDU(data, APCI.Length);
+                var s = new ASDU(data, APDU.APCILength);
             }
             catch (Exception e) { }
         }
@@ -85,7 +85,7 @@ namespace Shouyuan.IEC104
                         bi = revBuf[i];
                         if (rc == 0)
                         {
-                            if (bi != APCI.Header)
+                            if (bi != APDU.Header)
                                 continue;
                             else
                             {
@@ -98,7 +98,7 @@ namespace Shouyuan.IEC104
                             {
                                 len = (byte)(bi + 2);
                                 cBuf = new byte[len];
-                                cBuf[0] = APCI.Header;
+                                cBuf[0] = APDU.Header;
                                 cBuf[1] = bi;
                                 rc++;
                             }
