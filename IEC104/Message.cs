@@ -113,7 +113,7 @@ namespace Shouyuan.IEC104
                 byte c = 0;
                 if (Addr != null) c += (byte)Addr.Length;
                 if (Element != null) c += (byte)Element.Length;
-                if (TimeStamp != null) c += (byte)Element.Length;
+                if (TimeStamp != null) c += (byte)TimeStamp.Length;
                 return c;
             }
         }
@@ -154,7 +154,8 @@ namespace Shouyuan.IEC104
             Type = t;
             Element = new byte[t.Length()];
             Addr = new byte[addrl];
-            TimeStamp = new byte[tml];
+            if (tml > 0)
+                TimeStamp = new byte[tml];
         }
 
         public uint Address
@@ -177,7 +178,7 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length < 2)
+                if (TimeStamp == null || TimeStamp.Length < 2)
                     return 0;
                 ushort ms = (ushort)(TimeStamp[0] | TimeStamp[1] << 8);
                 switch (TimeStamp.Length)
@@ -192,7 +193,7 @@ namespace Shouyuan.IEC104
             }
             set
             {
-                if (TimeStamp.Length < 2)
+                if (TimeStamp == null || TimeStamp.Length < 2)
                     return;
                 if (TimeStamp.Length == 3 || TimeStamp.Length == 7)
                 {
@@ -210,26 +211,24 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length <= 2)
-                    return 0;
-                ushort ms = (ushort)(TimeStamp[0] | TimeStamp[1] << 8);
-                if (TimeStamp.Length == 3 || TimeStamp.Length == 7)
+                if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
+                {
+                    ushort ms = (ushort)(TimeStamp[0] | TimeStamp[1] << 8);
                     return (ushort)(ms / 1000);
+                }
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length < 2)
-                    return;
-                if (TimeStamp.Length == 3 || TimeStamp.Length == 7)
+                if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
                 {
                     ushort ms = (ushort)(TimeStamp[0] | TimeStamp[1] << 8);
                     ms = (ushort)(ms % 1000);
                     value = (ushort)(value * 1000 + ms);
+                    TimeStamp[0] = (byte)value;
+                    TimeStamp[1] = (byte)(value >> 8);
                 }
-                TimeStamp[0] = (byte)value;
-                TimeStamp[1] = (byte)(value >> 8);
             }
         }
 
@@ -237,14 +236,14 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 3 || TimeStamp.Length == 7)
+                if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
                     return (byte)(TimeStamp[2] & 0x3f);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 3 || TimeStamp.Length == 7)
+                if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
                     TimeStamp[2] = (byte)(TimeStamp[2] & 0x80 | value & 0x3f);
             }
         }
@@ -253,14 +252,16 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 7)
+
+                if (TimeStamp != null && TimeStamp.Length == 7)
                     return (byte)(TimeStamp[3] & 0x1f);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 7)
+
+                if (TimeStamp != null && TimeStamp.Length == 7)
                 {
                     TimeStamp[3] = (byte)(value & 0x1f);
                 }
@@ -272,14 +273,15 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 7)
+
+                if (TimeStamp != null && TimeStamp.Length == 7)
                     return (byte)(TimeStamp[4] & 0x1f);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                 {
                     TimeStamp[4] = (byte)(TimeStamp[4] & 0xe0 | value & 0x1f);
                 }
@@ -289,14 +291,14 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                     return (byte)((TimeStamp[4] & 0xe0) >> 5);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                 {
                     TimeStamp[4] = (byte)(TimeStamp[4] & 0x1f | (value << 5));
                 }
@@ -307,14 +309,14 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                     return (byte)(TimeStamp[5] & 0x0f);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                 {
                     TimeStamp[5] = (byte)(value & 0x0f);
                 }
@@ -324,16 +326,16 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                if (TimeStamp.Length == 7)
-                    return (byte)(TimeStamp[6] & 0x8f);
+                if (TimeStamp != null && TimeStamp.Length == 7)
+                    return (byte)(TimeStamp[6] & 0x7f);
                 else
                     return 0;
             }
             set
             {
-                if (TimeStamp.Length == 7)
+                if (TimeStamp != null && TimeStamp.Length == 7)
                 {
-                    TimeStamp[6] = (byte)(value & 0x8f);
+                    TimeStamp[6] = (byte)(value & 0x7f);
                 }
             }
         }

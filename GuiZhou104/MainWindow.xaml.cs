@@ -33,9 +33,12 @@ namespace GuiZhou104
             byte i = 0;
             i = i.SetBit(8).SetBit(8).SetBit(8);
             s.startService();
-            var m = new Message(ElementTypes.BCR, 1, 3);
-            m.Address = 8088;
-            
+            var m7 = new Message(ElementTypes.BCR, 1, 7);
+            var m2 = new Message(ElementTypes.BCR, 1, 2);
+            var m3 = new Message(ElementTypes.BCR, 1, 3);
+            var m1= new Message(ElementTypes.BCR, 1, 1);
+            var m0= new Message(ElementTypes.BCR, 1, 0);
+
         }
     }
 }
