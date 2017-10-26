@@ -29,7 +29,7 @@ namespace GuiZhou104
             InitializeComponent();
             APDU.Format = DatagramFormat.InformationTransmit;
             var m0 = new Message(ElementTypes.NVA, 3, 1, 0);
-            m0.NVA = 0.23f;
+            m0.NVA = 0.5f;
             APDU.SendingNumber = 0;
             APDU.RecevingNumber = 10;
             APDU.ASDU = ASDU;
@@ -51,8 +51,9 @@ namespace GuiZhou104
 
             try
             {
-               // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
-               
+                // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
+                ASDU.Messages.First().NVA = (DateTime.Now.Millisecond-500) / 500.0f;
+                Title = ASDU.Messages.First().NVA.ToString();
                 APDU.SendTo(s.linkSocket);
                 
             }

@@ -450,12 +450,12 @@ namespace Shouyuan.IEC104
             get
             {
                 CheckType(ElementTypes.NVA);
-                return (float)BitConverter.ToInt16(Element, 0) / ((1 << 15) - 1) * NVA_M;
+                return (float)BitConverter.ToInt16(Element, 0) / (1 << 15)  * NVA_M;
             }
             set
             {
                 CheckType(ElementTypes.NVA);
-                BitConverter.GetBytes((Int16)(value / NVA_M * ((1 << 15) - 1))).CopyTo(Element, 0);
+                BitConverter.GetBytes((Int16)(value / NVA_M * (1 << 15))).CopyTo(Element, 0);
             }
         }
 
