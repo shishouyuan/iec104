@@ -20,6 +20,8 @@ namespace GuiZhou104
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
+            MessageBox.Show(e.Exception.Message+"\n位于\n" + e.Exception.TargetSite.ToString()+"\n", "发生错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Handled = true;
             this.Shutdown();
         }
     }

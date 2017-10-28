@@ -48,7 +48,7 @@ namespace GuiZhou104
             byte i = 0;
             i = i.SetBit(8).SetBit(8).SetBit(8);
             s.startService();
-
+            
             try
             {
                 // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
