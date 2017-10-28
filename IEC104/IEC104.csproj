@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
+    <Compile Include="Datagram.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Slave.cs" />

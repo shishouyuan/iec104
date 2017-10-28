@@ -443,7 +443,7 @@ namespace Shouyuan.IEC104
         /// </summary>
         public float NVA_M = 1;
         /// <summary>
-        /// 规一划表示的数据的实际值。
+        /// 规一化表示的数据的实际值。
         /// </summary>
         public float NVA
         {
