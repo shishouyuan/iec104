@@ -161,17 +161,17 @@ namespace Shouyuan.IEC104
         /// </summary>
         /// <param name="t">信息元素类型。</param>
         /// <param name="addrl">地址长度，可选1、2、3个字节。</param>
-        /// <param name="qdsl">附加的限定描述词的数量。</param>
+        /// <param name="extrl">附加的限定描述词的数量。</param>
         /// <param name="tml">时标长度，可选2、3、7个字节。</param>
-        public Message(ElementTypes t, byte addrl, byte qdsl, byte tml)
+        public Message(ElementTypes t, byte addrl=3, byte extrl=0, byte tml=0)
         {
             Type = t;
             if (t.Length() > 0)
                 Element = new byte[t.Length()];
             if (addrl > 0)
                 Addr = new byte[addrl];
-            if (qdsl > 0)
-                Extra = new byte[qdsl];
+            if (extrl > 0)
+                Extra = new byte[extrl];
             if (tml > 0)
                 TimeStamp = new byte[tml];
         }

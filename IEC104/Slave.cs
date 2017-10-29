@@ -11,7 +11,7 @@ namespace Shouyuan.IEC104
     /// <summary>
     /// IEC104规约从站
     /// </summary>
-    public class Slave
+    public class Slave:Node
     {
 
         public Socket listenSocket, linkSocket;

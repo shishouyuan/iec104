@@ -81,8 +81,8 @@ namespace Shouyuan.IEC104
         /// </summary>
         public bool SQ
         {
-            get => (VSQ & 0x80) != 0;
-            set => VSQ = (byte)(value ? VSQ | 0x80 : VSQ & ~0x80);
+            get => VSQ.Bit(7);
+            set => VSQ = value ? VSQ.SetBit(7) : VSQ.ClearBit(7);
         }
 
         /// <summary>
@@ -116,17 +116,17 @@ namespace Shouyuan.IEC104
         /// </summary>
         public bool Test
         {
-            get => (COT1 & 0x80) != 0;
-            set => COT1 = (byte)(value ? COT1 | 0X80 : COT1 & ~0X80);
+            get => COT1.Bit(7);
+            set => COT1 = value ? COT1.SetBit(7) : COT1.ClearBit(7);
         }
 
         /// <summary>
-        /// 确认标志P/N，COT的次高位，0为P返回True，1为N返回False。
+        /// 确认标志P/N，COT的次高位,P为false。
         /// </summary>
         public bool PN
         {
-            get => (COT1 & 0x40) == 0;
-            set => COT1 = (byte)(value ? COT1 & ~0X40 : COT1 | 0X40);
+            get => COT1.Bit(6);
+            set => COT1 = value ? COT1.SetBit(6) : COT1.ClearBit(6);
         }
 
         public byte Length

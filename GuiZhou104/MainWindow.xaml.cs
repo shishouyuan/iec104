@@ -13,12 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Shouyuan.IEC104;
+using System.Net.Sockets;
+using System.Net;
 
 namespace GuiZhou104
 {
-   
 
-    
+
+
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -37,27 +39,47 @@ namespace GuiZhou104
             ASDU.Address = 1;
             ASDU.Cause = 3;
             m0.Address = 1;
-            ASDU.Type =9;
+            ASDU.Type = 9;
+
+             listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            listenSocket.Bind(new IPEndPoint(0, 2404));
+            listenSocket.Listen(1);
 
         }
+        Socket listenSocket;
         ASDU ASDU = new ASDU();
         APDU APDU = new APDU();
-        Slave s = new Slave(2404, 1);
+        Node node = new Node();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            byte i = 0;
-            i = i.SetBit(8).SetBit(8).SetBit(8);
-            s.startService();
-            
+           
+          
             try
             {
                 // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
-                ASDU.Messages.First().NVA = (DateTime.Now.Millisecond-500) / 500.0f;
-                Title = ASDU.Messages.First().NVA.ToString();
-                APDU.SendTo(s.linkSocket);
+                if (node.Socket == null)
+                {
+                  
+                    node.BindSocket(listenSocket.Accept());
+                    node.StartReceive();
+                    APDU.Format = DatagramFormat.UnnumberedControl;
+                    APDU.ControlFunction = ControlFunctions.STARTDT_A;
+                    APDU.SendTo(node.Socket);
+                }
+
+                    var dt = new M_ME_NA_1(1, 3,1);
+
+
+                dt.PutSQData(1,  (DateTime.Now.Millisecond - 500) / 500.0f);
+                dt.PutSQData(1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
+                dt.PutSQData(1, 0.7f);
+                dt.PutSQData(1, 0.8f);
+
+                node.SendDatagram(dt);
+                Title = dt.APDU.ASDU.Messages.First().NVA.ToString()+" "+node.VS+","+node.VR;
                 
             }
-            catch (Exception er) { }
+            catch (Exception er) { node.CloseSocket(); }
 
         }
     }
