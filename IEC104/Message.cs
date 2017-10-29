@@ -267,21 +267,21 @@ namespace Shouyuan.IEC104
         }
 
         /// <summary>
-        /// 对3、7字节的时标，指示时标是否有效，有效时为0，返回true,无效是为1，返回false。
+        /// 对3、7字节的时标，指示时标是否失效，有效时为0，返回false,无效是为1，返回true。
         /// </summary>
         public bool Time_IV
         {
             get
             {
                 if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
-                    return !TimeStamp[2].Bit(7);
+                    return TimeStamp[2].Bit(7);
                 else
                     return false;
             }
             set
             {
                 if (TimeStamp != null && (TimeStamp.Length == 3 || TimeStamp.Length == 7))
-                    TimeStamp[2] = value ? TimeStamp[2].ClearBit(7) : TimeStamp[2].SetBit(7);
+                    TimeStamp[2] = value ? TimeStamp[2].SetBit(7) : TimeStamp[2].ClearBit(7);
             }
         }
         public byte Hours
@@ -378,10 +378,10 @@ namespace Shouyuan.IEC104
         }
 
         #region 品质描述词QDS
-        private byte QDSi = 0;
+        public byte QDSi = 0;
 
         /// <summary>
-        /// 品质描述词溢出标志，1有效。
+        /// 品质描述词溢出标志，true为溢出。
         /// </summary>
         public bool QDS_OV
         {
@@ -390,7 +390,7 @@ namespace Shouyuan.IEC104
         }
 
         /// <summary>
-        /// 品质描述词封锁标志，1有效。
+        /// 品质描述词封锁标志，true为被封锁。
         /// </summary>
         public bool QDS_BL
         {
@@ -399,7 +399,7 @@ namespace Shouyuan.IEC104
         }
 
         /// <summary>
-        /// 品质描述词取代标志，1有效。
+        /// 品质描述词取代标志，ture为被取代。
         /// </summary>
         public bool QDS_SB
         {
@@ -409,22 +409,22 @@ namespace Shouyuan.IEC104
         }
 
         /// <summary>
-        /// 品质描述词刷新标志，0有效。
+        /// 品质描述词刷新失败标志，true为刷新失败。
         /// </summary>
         public bool QDS_NT
         {
-            get => !Extra[QDSi].Bit(6);
-            set => Extra[QDSi] = value ? Extra[QDSi].ClearBit(6) : Extra[QDSi].SetBit(6);
+            get => Extra[QDSi].Bit(6);
+            set => Extra[QDSi] = value ?  Extra[QDSi].SetBit(6) :Extra[QDSi].ClearBit(6);
 
         }
 
         /// <summary>
-        /// 品质描述词有效标志，0有效。
+        /// 品质描述词失效标志，true为无效。
         /// </summary>
         public bool QDS_IV
         {
-            get => !Extra[QDSi].Bit(7);
-            set => Extra[QDSi] = value ? Extra[QDSi].ClearBit(7) : Extra[QDSi].SetBit(7);
+            get => Extra[QDSi].Bit(7);
+            set => Extra[QDSi] = value ?Extra[QDSi].SetBit(7):  Extra[QDSi].ClearBit(7) ;
 
         }
         #endregion
