@@ -41,46 +41,64 @@ namespace GuiZhou104
             m0.Address = 1;
             ASDU.Type = 9;
 
-             listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             listenSocket.Bind(new IPEndPoint(0, 2404));
             listenSocket.Listen(1);
+            timer.Interval = 500;
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
 
         }
+
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(() => { Title = "S " + node.VS + ",V" + node.VR + ",A" + node.ACK; });
+
+        }
+
         Socket listenSocket;
         ASDU ASDU = new ASDU();
         APDU APDU = new APDU();
         Node node = new Node();
+        System.Timers.Timer timer = new System.Timers.Timer();
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-           
-          
+
+
             try
             {
                 // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
-                if (node.Socket == null)
+                if (node.Socket != null)
                 {
-                  
-                    node.BindSocket(listenSocket.Accept());
-                    node.StartReceive();
-                    APDU.Format = DatagramFormat.UnnumberedControl;
-                    APDU.ControlFunction = ControlFunctions.STARTDT_A;
-                    APDU.SendTo(node.Socket);
+
+
+
+                    var dt = new M_ME_NA_1(1, 3, 1);
+
+
+                    dt.PutSQData(1, (DateTime.Now.Millisecond - 500) / 500.0f);
+                    dt.PutSQData(1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
+                    dt.PutSQData(1, 0.7f);
+                    dt.PutSQData(1, 0.8f);
+
+                    node.SendDatagram(dt);
+                    Title = dt.APDU.ASDU.Messages.First().NVA.ToString() + " " + node.VS + "," + node.VR;
                 }
-
-                    var dt = new M_ME_NA_1(1, 3,1);
-
-
-                dt.PutSQData(1,  (DateTime.Now.Millisecond - 500) / 500.0f);
-                dt.PutSQData(1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
-                dt.PutSQData(1, 0.7f);
-                dt.PutSQData(1, 0.8f);
-
-                node.SendDatagram(dt);
-                Title = dt.APDU.ASDU.Messages.First().NVA.ToString()+" "+node.VS+","+node.VR;
-                
             }
-            catch (Exception er) { node.CloseSocket(); }
+            catch (Exception er) { node.CloseConnection(); }
 
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (node.Socket == null)
+            {
+
+                node.BindSocket(listenSocket.Accept());
+                node.StartReceive();
+
+
+            }
         }
     }
 }

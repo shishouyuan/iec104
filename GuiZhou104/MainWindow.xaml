@@ -8,6 +8,7 @@
         Title="MainWindow" Height="350" Width="525">
     <StackPanel>
         <TextBlock Name="tb"/>
-        <Button Content="test" Click="Button_Click"/>
+        <Button Content="Send" Click="Button_Click"/>
+        <Button Content="Connect" Click="Button_Click_1"/>
     </StackPanel>
 </Window>

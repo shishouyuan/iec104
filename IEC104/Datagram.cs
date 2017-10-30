@@ -30,6 +30,15 @@ namespace Shouyuan.IEC104
         }
     }
 
+    public class UDatagram : Datagram
+    {
+        public UDatagram(ControlFunctions f):base(new APDU())
+        {
+            APDU.Format = DatagramFormat.UnnumberedControl;
+            APDU.ControlFunction = f;
+        }
+    }
+
 
     public abstract class InfoDatagram : Datagram
     {
