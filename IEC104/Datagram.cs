@@ -42,7 +42,7 @@ namespace Shouyuan.IEC104
     public abstract class InfoDatagram : Datagram
     {
 
-        public virtual byte ASDUType { get; set; }
+        public abstract byte ASDUType { get; set; }
         protected InfoDatagram(byte asduAddr, byte cause) : base(new APDU())
         {
             APDU.ASDU = new ASDU();
@@ -72,10 +72,11 @@ namespace Shouyuan.IEC104
 
         public override byte TimeStampLength => 0;
 
+        public override byte ASDUType { get; set; } = 9;
 
         public M_ME_NA_1() : base(null)
         {
-            ASDUType = 9;
+            //ASDUType = 9;
         }
 
         public M_ME_NA_1(byte asduAddr, byte cause, uint firstaddr = 0, byte type = 9) : base(asduAddr, cause)

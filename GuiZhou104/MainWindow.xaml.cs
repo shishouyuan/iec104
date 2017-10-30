@@ -45,6 +45,13 @@ namespace GuiZhou104
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
+            var q = from i in typeof(InfoDatagram).Assembly.GetTypes()
+                    where i.IsSubclassOf(typeof(InfoDatagram)) && !i.IsAbstract
+                    select i;
+            foreach (var i in q)
+            {
+                var l = Activator.CreateInstance(i,new APDU());
+            }
         }
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -73,10 +80,10 @@ namespace GuiZhou104
                     var dt = new M_ME_NA_1(1, 3);
 
 
-                    dt.PutData(1,1, (DateTime.Now.Millisecond - 500) / 500.0f);
-                    dt.PutData(2,1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
-                    dt.PutData(4,1, 0.7f);
-                    dt.PutData(6,1, 0.8f);
+                    dt.PutData(1, 1, (DateTime.Now.Millisecond - 500) / 500.0f);
+                    dt.PutData(2, 1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
+                    dt.PutData(4, 1, 0.7f);
+                    dt.PutData(6, 1, 0.8f);
 
                     node.SendDatagram(dt);
                     Title = dt.APDU.ASDU.Messages.First().NVA.ToString() + " " + node.VS + "," + node.VR;
@@ -86,7 +93,7 @@ namespace GuiZhou104
                     dt = new M_ME_NA_1(papdu);
                     node.SendDatagram(dt);
                 }
-              
+
             }
             catch (Exception er) { node.CloseConnection(); }
 

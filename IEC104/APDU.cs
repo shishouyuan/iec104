@@ -318,7 +318,6 @@ namespace Shouyuan.IEC104
                                     m.TimeStamp[i] = buf[bi++];
                                 ASDU.Messages.Add(m);
                             }
-
                         }
                         else
                         {
