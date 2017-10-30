@@ -176,19 +176,30 @@ namespace Shouyuan.IEC104
                 TimeStamp = new byte[tml];
         }
 
+        uint actualAddress=0;
         public uint Address
         {
             get
             {
-                uint v = Addr[0];
-                for (var i = 1; i < Addr.Length; i++)
-                    v |= (uint)Addr[i] << (i * 8);
-                return v;
+                if (Addr != null)
+                {
+                    uint v = Addr[0];
+                    for (var i = 1; i < Addr.Length; i++)
+                        v |= (uint)Addr[i] << (i * 8);
+                    return v;
+                }
+                else
+                    return actualAddress;
             }
             set
             {
-                for (var i = 0; i < Addr.Length; i++)
-                    Addr[i] = (byte)(value >> (i * 8));
+                if (Addr != null)
+                {
+                    for (var i = 0; i < Addr.Length; i++)
+                        Addr[i] = (byte)(value >> (i * 8));
+                }
+                else
+                    actualAddress = value;
             }
         }
 
@@ -578,16 +589,16 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public void SendTo(System.Net.Sockets.Socket socket)
+        public void SaveTo(List<byte> buf)
         {
             if (Addr != null)
-                socket.Send(Addr);
+                buf.AddRange(Addr);
             if (Element != null)
-                socket.Send(Element);
+                buf.AddRange(Element);
             if (Extra != null)
-                socket.Send(Extra);
+                buf.AddRange(Extra);
             if (TimeStamp != null)
-                socket.Send(TimeStamp);
+                buf.AddRange(TimeStamp);
         }
     }
 }

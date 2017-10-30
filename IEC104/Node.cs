@@ -38,12 +38,13 @@ namespace Shouyuan.IEC104
         /// <summary>
         /// 通道长期空闲时发送确认帧的超时时间。
         /// </summary>
-        public ushort t3 = 10 * 1000;
+        public ushort t3 = 20 * 1000;
 
         private DateTime lastRevTime;
         private DateTime lastIRevTime;
         private ushort lastSendVR;
-        private DateTime LastSentTime;
+        private DateTime lastSentTime;
+        private DateTime lastUISentTime;
 
         public delegate void NewDatagramEventHandler(Datagram d, Node sender);
         public event NewDatagramEventHandler NewDatagram;
@@ -71,7 +72,7 @@ namespace Shouyuan.IEC104
         {
             lastRevTime = DateTime.Now;
             testDatagramSentInCycle = false;
-            var a = new APDU(data, 0);
+            var a = new APDU(data);
 
             switch (a.Format)
             {
@@ -79,15 +80,19 @@ namespace Shouyuan.IEC104
                     VR = (ushort)(a.SendingNumber + 1);
                     lastIRevTime = lastRevTime;
                     ACK = a.RecevingNumber;
+                    UIResponsed = true;
                     if (((VR - lastSendVR) & 0x7fff) >= W)
                         SendSDatagram();
                     break;
                 case DatagramFormat.NumberedSupervisory:
                     ACK = a.RecevingNumber;
+                    UIResponsed = true;
                     break;
                 case DatagramFormat.UnnumberedControl:
                     if ((byte)a.ControlFunction % 2 == 0)
                         SendDatagram(new UDatagram(a.ControlFunction + 1));
+                    else
+                        UIResponsed = true;
                     break;
             }
         }
@@ -150,8 +155,8 @@ namespace Shouyuan.IEC104
 
             }
             catch (Exception e)
-            {               
-                    CloseConnection();
+            {
+                CloseConnection();
             }
             if (ConnectionLost != null)
             {
@@ -166,7 +171,7 @@ namespace Shouyuan.IEC104
             ACK = 0;
             lastSendVR = 0;
             testDatagramSentInCycle = false;
-            needResponse = false;
+            UIResponsed = true;
         }
         public void StartReceive()
         {
@@ -205,26 +210,26 @@ namespace Shouyuan.IEC104
 
 
         bool testDatagramSentInCycle = false;
-        bool needResponse = false;
+        bool UIResponsed = true;
         private void TimerLoop(object sender, System.Timers.ElapsedEventArgs e)
         {
             if (Socket == null)
             {
-                timer.Stop();
+                CloseConnection();
                 return;
             }
             var now = DateTime.Now;
 
-            if (needResponse && (now - lastRevTime).TotalMilliseconds >= t1)
+            if (!UIResponsed && (now - lastUISentTime).TotalMilliseconds >= t1)
             {
                 CloseConnection();
                 return;
             }
-            else if (lastSendVR != VR && (lastIRevTime - now).TotalMilliseconds >= t2)
+            else if (lastSendVR != VR && (now - lastIRevTime).TotalMilliseconds >= t2)
             {
                 SendSDatagram();
             }
-            else if (!testDatagramSentInCycle && (now - lastRevTime).TotalMilliseconds >= t3 && (now - LastSentTime).TotalMilliseconds >= t3)
+            else if (!testDatagramSentInCycle && (now - lastRevTime).TotalMilliseconds >= t3 && (now - lastSentTime).TotalMilliseconds >= t3)
             {
                 SendTestDatagram();
                 testDatagramSentInCycle = true;
@@ -247,31 +252,37 @@ namespace Shouyuan.IEC104
             init();
         }
 
+        List<byte> sendBuf = new List<byte>(260);
         public void SendDatagram(Datagram d)
         {
             if (socket == null) return;
             lock (this)
             {
-
+                lastSentTime = DateTime.Now;
                 switch (d.APDU.Format)
                 {
                     case DatagramFormat.InformationTransmit:
                         d.APDU.RecevingNumber = VR;
                         lastSendVR = VR;
                         d.APDU.SendingNumber = VS++;
-                        needResponse = true;
+                        UIResponsed = false;
+                        lastUISentTime = lastSentTime;
                         break;
                     case DatagramFormat.NumberedSupervisory:
                         d.APDU.RecevingNumber = VR;
                         lastSendVR = VR;
-                        needResponse = false;
                         break;
                     case DatagramFormat.UnnumberedControl:
-                        needResponse = (byte)d.APDU.ControlFunction % 2 == 0;
+                        if ((byte)d.APDU.ControlFunction % 2 == 0)
+                        {
+                            UIResponsed = false;
+                            lastUISentTime = lastSentTime;
+                        }
                         break;
                 }
-                d.SendTo(socket);
-                LastSentTime = DateTime.Now;
+                sendBuf.Clear();
+                d.SaveTo(sendBuf);
+                socket.Send(sendBuf.ToArray());
                 if (((VS - ACK) & 0x7fff) >= K)
                     CloseConnection();
             }

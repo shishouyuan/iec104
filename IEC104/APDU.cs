@@ -87,14 +87,14 @@ namespace Shouyuan.IEC104
 
         public const int APCILength = 6;
 
-                
-        public byte[] APCIValues = new byte[6];
+
+        public readonly byte[] APCIValues = new byte[6];
 
         public byte[] ActualAPCIValues
         {
             get
             {
-               
+
                 var a = (byte[])APCIValues.Clone();
                 a[1] = ActualLength;
                 return a;
@@ -276,11 +276,73 @@ namespace Shouyuan.IEC104
 
         }
 
-        public APDU(byte[] buf, byte starti = 0)
+        public byte[] InputedBuffer;
+
+        public APDU(byte[] buf, InfoDatagram infoDatagram = null)
         {
-            for (int i = 0; i < APCILength; i++)
-                APCIValues[i] = buf[starti + i];
-            APCIValues[0] = Header;
+            if (buf[0] == Header && buf.Length >= APCILength)
+            {
+                InputedBuffer = buf;
+                for (int i = 0; i < APCIValues.Length; i++)
+                    APCIValues[i] = buf[i];
+                if (infoDatagram == null)
+                    return;
+                if (Format == DatagramFormat.InformationTransmit)
+                {
+                    ASDU = new ASDU(buf, APCILength);
+                    if (infoDatagram.ASDUType == ASDU.Type)
+                    {
+                        byte bi = APCILength + ASDU.HeaderLength;
+                        if (ASDU.SQ)
+                        {
+                            var m = new Message(infoDatagram.ElementType, infoDatagram.AddrLength, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
+                            for (int i = 0; i < infoDatagram.AddrLength; i++)
+                                m.Addr[i] = buf[bi++];
+                            for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
+                                m.Element[i] = buf[bi++];
+                            for (int i = 0; i < infoDatagram.ExtraLength; i++)
+                                m.Extra[i] = buf[bi++];
+                            for (int i = 0; i < infoDatagram.TimeStampLength; i++)
+                                m.TimeStamp[i] = buf[bi++];
+                            ASDU.Messages.Add(m);
+                            var addr = m.Address;
+                            for (int k = 1; k < ASDU.MsgCount; k++)
+                            {
+                                m = new Message(infoDatagram.ElementType, 0, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
+                                m.Address = ++addr;
+                                for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
+                                    m.Element[i] = buf[bi++];
+                                for (int i = 0; i < infoDatagram.ExtraLength; i++)
+                                    m.Extra[i] = buf[bi++];
+                                for (int i = 0; i < infoDatagram.TimeStampLength; i++)
+                                    m.TimeStamp[i] = buf[bi++];
+                                ASDU.Messages.Add(m);
+                            }
+
+                        }
+                        else
+                        {
+                            for (int k = 0; k < ASDU.MsgCount; k++)
+                            {
+                                var m = new Message(infoDatagram.ElementType, infoDatagram.AddrLength, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
+                                for (int i = 0; i < infoDatagram.AddrLength; i++)
+                                    m.Addr[i] = buf[bi++];
+                                for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
+                                    m.Element[i] = buf[bi++];
+                                for (int i = 0; i < infoDatagram.ExtraLength; i++)
+                                    m.Extra[i] = buf[bi++];
+                                for (int i = 0; i < infoDatagram.TimeStampLength; i++)
+                                    m.TimeStamp[i] = buf[bi++];
+                                ASDU.Messages.Add(m);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("不是一个合法的APDU数据。");
+            }
         }
 
         public byte ActualLength
@@ -291,11 +353,11 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public void SendTo(System.Net.Sockets.Socket socket)
+        public void SaveTo(List<byte> buf)
         {
-            socket.Send(ActualAPCIValues);
+            buf.AddRange(ActualAPCIValues);
             if (Format == DatagramFormat.InformationTransmit)
-                ASDU.SendTo(socket);
+                ASDU.SaveTo(buf);
         }
 
     }
@@ -304,9 +366,9 @@ namespace Shouyuan.IEC104
     {
         void Send(byte[] d);
     }
-    public  class d : sk
+    public class d : sk
     {
-       public List<byte> list = new List<byte>();
+        public List<byte> list = new List<byte>();
         void sk.Send(byte[] d)
         {
             list.AddRange(d);

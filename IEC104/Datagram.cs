@@ -10,11 +10,10 @@ namespace Shouyuan.IEC104
     public abstract class Datagram
     {
         public readonly APDU APDU;
-        public virtual byte Type { get; set; }
-        public virtual DatagramFormat DatagramFormat { get => DatagramFormat.Unknown; }
-        public virtual void SendTo(System.Net.Sockets.Socket socket)
+        //public virtual DatagramFormat DatagramFormat { get => DatagramFormat.Unknown; }
+        public virtual void SaveTo(List<byte> buf)
         {
-            APDU.SendTo(socket);
+            APDU.SaveTo(buf);
         }
         protected Datagram(APDU apdu)
         {
@@ -22,9 +21,9 @@ namespace Shouyuan.IEC104
         }
     }
 
-    public class SDatagram: Datagram
+    public class SDatagram : Datagram
     {
-        public SDatagram() : base(new APDU () )
+        public SDatagram() : base(new APDU())
         {
             APDU.Format = DatagramFormat.NumberedSupervisory;
         }
@@ -32,7 +31,7 @@ namespace Shouyuan.IEC104
 
     public class UDatagram : Datagram
     {
-        public UDatagram(ControlFunctions f):base(new APDU())
+        public UDatagram(ControlFunctions f) : base(new APDU())
         {
             APDU.Format = DatagramFormat.UnnumberedControl;
             APDU.ControlFunction = f;
@@ -42,11 +41,23 @@ namespace Shouyuan.IEC104
 
     public abstract class InfoDatagram : Datagram
     {
+
+        public virtual byte ASDUType { get; set; }
         protected InfoDatagram(byte asduAddr, byte cause) : base(new APDU())
         {
             APDU.ASDU = new ASDU();
             APDU.ASDU.Address = asduAddr;
             APDU.ASDU.Cause = cause;
+        }
+
+        public abstract ElementTypes ElementType { get; }
+        public abstract byte ExtraLength { get; }
+        public abstract byte TimeStampLength { get; }
+        public virtual byte AddrLength { get => 3; }
+
+        protected InfoDatagram(APDU apdu) : base(apdu)
+        {
+
         }
     }
 
@@ -54,11 +65,24 @@ namespace Shouyuan.IEC104
     {
         public bool SQ { get; }
         public uint FirstMsgAddr { get; }
+
+        public override  ElementTypes ElementType  =>ElementTypes.NVA;
+
+        public override byte ExtraLength => 1;
+
+        public override byte TimeStampLength => 0;
+
+
+        public M_ME_NA_1() : base(null)
+        {
+            ASDUType = 9;
+        }
+
         public M_ME_NA_1(byte asduAddr, byte cause, uint firstaddr = 0, byte type = 9) : base(asduAddr, cause)
         {
             APDU.ASDU = new ASDU();
             APDU.ASDU.Type = type;
-            Type = type;
+            ASDUType = type;
             FirstMsgAddr = firstaddr;
             SQ = firstaddr != 0;
             APDU.ASDU.SQ = SQ;
@@ -69,7 +93,7 @@ namespace Shouyuan.IEC104
             if (SQ)
                 throw new Exception("此方法适用于非顺序发送信息体。");
 
-            var m = new Message(t: ElementTypes.NVA, extrl: 1);
+            var m = new Message( ElementType,AddrLength,ExtraLength,TimeStampLength);
             m.NVA_M = max;
             m.NVA = val;
             m.Address = addr;
@@ -83,17 +107,21 @@ namespace Shouyuan.IEC104
             Message m;
             if (APDU.ASDU.Messages.Count == 0)
             {
-                m = new Message(t: ElementTypes.NVA, extrl: 1);
+                m = new Message(ElementType, AddrLength, ExtraLength, TimeStampLength);
                 m.Address = FirstMsgAddr;
             }
             else
             {
-                m = new Message(t: ElementTypes.NVA, extrl: 1, addrl: 0);
+                m = new Message(ElementType, 0, ExtraLength, TimeStampLength);
             }
             m.NVA_M = max;
             m.NVA = val;
             APDU.ASDU.Messages.Add(m);
         }
 
+        public M_ME_NA_1(APDU apdu) : base(apdu)
+        {
+
+        }
     }
 }

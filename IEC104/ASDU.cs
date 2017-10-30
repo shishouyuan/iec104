@@ -156,11 +156,11 @@ namespace Shouyuan.IEC104
 
         }
 
-        public void SendTo(System.Net.Sockets.Socket socket)
+        public void SaveTo(List<byte> buf)
         {
-            socket.Send(ActualValues);
+            buf.AddRange(ActualValues);
             foreach (var msg in Messages)
-                msg.SendTo(socket);
+                msg.SaveTo(buf);
         }
     }
 }

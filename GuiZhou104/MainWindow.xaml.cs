@@ -41,9 +41,6 @@ namespace GuiZhou104
             m0.Address = 1;
             ASDU.Type = 9;
 
-            listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            listenSocket.Bind(new IPEndPoint(0, 2404));
-            listenSocket.Listen(1);
             timer.Interval = 500;
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
@@ -73,17 +70,23 @@ namespace GuiZhou104
 
 
 
-                    var dt = new M_ME_NA_1(1, 3, 1);
+                    var dt = new M_ME_NA_1(1, 3);
 
 
-                    dt.PutSQData(1, (DateTime.Now.Millisecond - 500) / 500.0f);
-                    dt.PutSQData(1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
-                    dt.PutSQData(1, 0.7f);
-                    dt.PutSQData(1, 0.8f);
+                    dt.PutData(1,1, (DateTime.Now.Millisecond - 500) / 500.0f);
+                    dt.PutData(2,1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
+                    dt.PutData(4,1, 0.7f);
+                    dt.PutData(6,1, 0.8f);
 
                     node.SendDatagram(dt);
                     Title = dt.APDU.ASDU.Messages.First().NVA.ToString() + " " + node.VS + "," + node.VR;
+                    var list = new List<byte>();
+                    dt.SaveTo(list);
+                    var papdu = new APDU(list.ToArray(), new M_ME_NA_1());
+                    dt = new M_ME_NA_1(papdu);
+                    node.SendDatagram(dt);
                 }
+              
             }
             catch (Exception er) { node.CloseConnection(); }
 
@@ -93,11 +96,15 @@ namespace GuiZhou104
         {
             if (node.Socket == null)
             {
-
+                if (listenSocket != null)
+                    listenSocket.Dispose();
+                listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                listenSocket.Bind(new IPEndPoint(0, 2404));
+                listenSocket.Listen(1);
                 node.BindSocket(listenSocket.Accept());
                 node.StartReceive();
-
-
+                listenSocket.Dispose();
+                listenSocket = null;
             }
         }
     }
