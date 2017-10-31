@@ -163,7 +163,7 @@ namespace Shouyuan.IEC104
         /// <param name="addrl">地址长度，可选1、2、3个字节。</param>
         /// <param name="extrl">附加的限定描述词的数量。</param>
         /// <param name="tml">时标长度，可选2、3、7个字节。</param>
-        public Message(ElementType t, byte addrl=3, byte extrl=0, byte tml=0)
+        public Message(ElementType t, byte addrl = 3, byte extrl = 0, byte tml = 0)
         {
             Type = t;
             if (t.Length() > 0)
@@ -176,7 +176,7 @@ namespace Shouyuan.IEC104
                 TimeStamp = new byte[tml];
         }
 
-        uint actualAddress=0;
+        uint actualAddress = 0;
         public uint Address
         {
             get
@@ -425,7 +425,7 @@ namespace Shouyuan.IEC104
         public bool QDS_NT
         {
             get => Extra[QDSi].Bit(6);
-            set => Extra[QDSi] = value ?  Extra[QDSi].SetBit(6) :Extra[QDSi].ClearBit(6);
+            set => Extra[QDSi] = value ? Extra[QDSi].SetBit(6) : Extra[QDSi].ClearBit(6);
 
         }
 
@@ -435,7 +435,7 @@ namespace Shouyuan.IEC104
         public bool QDS_IV
         {
             get => Extra[QDSi].Bit(7);
-            set => Extra[QDSi] = value ?Extra[QDSi].SetBit(7):  Extra[QDSi].ClearBit(7) ;
+            set => Extra[QDSi] = value ? Extra[QDSi].SetBit(7) : Extra[QDSi].ClearBit(7);
 
         }
         #endregion
@@ -461,7 +461,7 @@ namespace Shouyuan.IEC104
             get
             {
                 CheckType(ElementType.NVA);
-                return (float)BitConverter.ToInt16(Element, 0) / (1 << 15)  * NVA_M;
+                return (float)BitConverter.ToInt16(Element, 0) / (1 << 15) * NVA_M;
             }
             set
             {

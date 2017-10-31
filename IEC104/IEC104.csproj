@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
-    <Compile Include="Datagram.cs" />
+    <Compile Include="DatagramFormatters\M_ME_NA_1.cs" />
+    <Compile Include="DatagramFormatterBase.cs" />
+    <Compile Include="DatagramFormatterManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Node.cs" />

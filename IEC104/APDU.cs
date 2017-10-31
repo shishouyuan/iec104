@@ -270,19 +270,19 @@ namespace Shouyuan.IEC104
 
         #endregion
 
-        public APDU()
+        public readonly DatagramFormatterBase Datagram;
+        public APDU(DatagramFormatterBase datagram = null)
         {
+            Datagram = datagram;
             APCIValues[0] = Header;
 
         }
 
-        public byte[] InputedBuffer;
-
-        public APDU(byte[] buf)
+        public APDU(byte[] buf, DatagramFormatterBase datagram = null)
         {
+            Datagram = datagram;
             if (buf[0] == Header && buf.Length >= APCILength)
             {
-                InputedBuffer = buf;
                 for (int i = 0; i < APCIValues.Length; i++)
                     APCIValues[i] = buf[i];
             }

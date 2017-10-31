@@ -46,7 +46,7 @@ namespace Shouyuan.IEC104
         private DateTime lastSentTime;
         private DateTime lastUISentTime;
 
-        public delegate void NewDatagramEventHandler(Datagram d, Node sender);
+        public delegate void NewDatagramEventHandler(DatagramFormatterManager d, Node sender);
         public event NewDatagramEventHandler NewDatagram;
 
         public delegate void ConnectionLostEventHandler(Node sender);
@@ -90,7 +90,7 @@ namespace Shouyuan.IEC104
                     break;
                 case DatagramFormat.UnnumberedControl:
                     if ((byte)a.ControlFunction % 2 == 0)
-                       SendUDatagram(a.ControlFunction + 1);
+                        SendUDatagram(a.ControlFunction + 1);
                     else
                         UIResponsed = true;
                     break;
@@ -187,7 +187,7 @@ namespace Shouyuan.IEC104
         {
             var apdu = new APDU();
             apdu.Format = DatagramFormat.NumberedSupervisory;
-            SendAPDU(apdu );
+            SendAPDU(apdu);
 
         }
         void SendUDatagram(ControlFunction cf)
@@ -291,6 +291,7 @@ namespace Shouyuan.IEC104
 
         }
 
+        public DatagramFormatterManager Datagram = new DatagramFormatterManager();
 
 
     }

@@ -19,7 +19,7 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                var a =(byte[]) Values.Clone();
+                var a = (byte[])Values.Clone();
                 a[1] = (byte)(SQ ? Messages.Count | 0x80 : Messages.Count & ~0x80);
                 return a;
             }
