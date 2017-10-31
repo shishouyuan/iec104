@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Shouyuan.IEC104
 {
-    public enum ElementTypes : byte
+    public enum ElementType : byte
     {
         /// <summary>
         /// 无内容。
@@ -149,12 +149,12 @@ namespace Shouyuan.IEC104
             1,//QOS
             1//QRP            
         };
-        public static byte GetElementTypeLength(ElementTypes t)
+        public static byte GetElementTypeLength(ElementType t)
         {
             return elementTypeLengths[(byte)t];
         }
 
-        public ElementTypes Type { get; }
+        public ElementType Type { get; }
 
         /// <summary>
         /// 实例化信息体。
@@ -163,7 +163,7 @@ namespace Shouyuan.IEC104
         /// <param name="addrl">地址长度，可选1、2、3个字节。</param>
         /// <param name="extrl">附加的限定描述词的数量。</param>
         /// <param name="tml">时标长度，可选2、3、7个字节。</param>
-        public Message(ElementTypes t, byte addrl=3, byte extrl=0, byte tml=0)
+        public Message(ElementType t, byte addrl=3, byte extrl=0, byte tml=0)
         {
             Type = t;
             if (t.Length() > 0)
@@ -440,7 +440,7 @@ namespace Shouyuan.IEC104
         }
         #endregion
 
-        private bool CheckType(ElementTypes t, bool err = true)
+        private bool CheckType(ElementType t, bool err = true)
         {
             if (t == Type)
                 return true;
@@ -460,12 +460,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.NVA);
+                CheckType(ElementType.NVA);
                 return (float)BitConverter.ToInt16(Element, 0) / (1 << 15)  * NVA_M;
             }
             set
             {
-                CheckType(ElementTypes.NVA);
+                CheckType(ElementType.NVA);
                 BitConverter.GetBytes((Int16)(value / NVA_M * (1 << 15))).CopyTo(Element, 0);
             }
         }
@@ -477,12 +477,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.SVA);
+                CheckType(ElementType.SVA);
                 return BitConverter.ToInt16(Element, 0);
             }
             set
             {
-                CheckType(ElementTypes.SVA);
+                CheckType(ElementType.SVA);
                 BitConverter.GetBytes(value).CopyTo(Element, 0);
             }
         }
@@ -494,12 +494,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.R);
+                CheckType(ElementType.R);
                 return BitConverter.ToSingle(Element, 0);
             }
             set
             {
-                CheckType(ElementTypes.R);
+                CheckType(ElementType.R);
                 BitConverter.GetBytes(value).CopyTo(Element, 0);
             }
         }
@@ -511,12 +511,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 return BitConverter.ToInt32(Element, 0);
             }
             set
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 BitConverter.GetBytes(value).CopyTo(Element, 0);
             }
         }
@@ -528,12 +528,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 return (byte)(Element[4] & 0x1f);
             }
             set
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 Element[4] = (byte)(Element[4] & 0xe0 | value & 0x1f);
             }
         }
@@ -545,12 +545,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 return Element[4].Bit(5);
             }
             set
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 Element[4] = value ? Element[4].SetBit(5) : Element[4].ClearBit(5);
             }
         }
@@ -562,12 +562,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 return Element[4].Bit(6);
             }
             set
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 Element[4] = value ? Element[4].SetBit(6) : Element[4].ClearBit(6);
             }
         }
@@ -579,12 +579,12 @@ namespace Shouyuan.IEC104
         {
             get
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 return !Element[4].Bit(7);
             }
             set
             {
-                CheckType(ElementTypes.BCR);
+                CheckType(ElementType.BCR);
                 Element[4] = !value ? Element[4].SetBit(7) : Element[4].ClearBit(7);
             }
         }

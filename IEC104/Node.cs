@@ -90,7 +90,7 @@ namespace Shouyuan.IEC104
                     break;
                 case DatagramFormat.UnnumberedControl:
                     if ((byte)a.ControlFunction % 2 == 0)
-                        SendDatagram(new UDatagram(a.ControlFunction + 1));
+                       SendUDatagram(a.ControlFunction + 1);
                     else
                         UIResponsed = true;
                     break;
@@ -185,16 +185,18 @@ namespace Shouyuan.IEC104
 
         void SendSDatagram()
         {
-            SendDatagram(new SDatagram());
+            var apdu = new APDU();
+            apdu.Format = DatagramFormat.NumberedSupervisory;
+            SendAPDU(apdu );
 
         }
-        void SendTestDatagram()
+        void SendUDatagram(ControlFunction cf)
         {
-            SendDatagram(new UDatagram(ControlFunctions.TESTFR_C));
-
+            var apdu = new APDU();
+            apdu.Format = DatagramFormat.UnnumberedControl;
+            apdu.ControlFunction = cf;
+            SendAPDU(apdu);
         }
-
-
 
         System.Timers.Timer timer = new System.Timers.Timer(100);
         public Node()
@@ -231,7 +233,7 @@ namespace Shouyuan.IEC104
             }
             else if (!testDatagramSentInCycle && (now - lastRevTime).TotalMilliseconds >= t3 && (now - lastSentTime).TotalMilliseconds >= t3)
             {
-                SendTestDatagram();
+                SendUDatagram(ControlFunction.TESTFR_C);
                 testDatagramSentInCycle = true;
             }
 
@@ -253,27 +255,27 @@ namespace Shouyuan.IEC104
         }
 
         List<byte> sendBuf = new List<byte>(260);
-        public void SendDatagram(Datagram d)
+        public void SendAPDU(APDU apdu)
         {
             if (socket == null) return;
             lock (this)
             {
                 lastSentTime = DateTime.Now;
-                switch (d.APDU.Format)
+                switch (apdu.Format)
                 {
                     case DatagramFormat.InformationTransmit:
-                        d.APDU.RecevingNumber = VR;
+                        apdu.RecevingNumber = VR;
                         lastSendVR = VR;
-                        d.APDU.SendingNumber = VS++;
+                        apdu.SendingNumber = VS++;
                         UIResponsed = false;
                         lastUISentTime = lastSentTime;
                         break;
                     case DatagramFormat.NumberedSupervisory:
-                        d.APDU.RecevingNumber = VR;
+                        apdu.RecevingNumber = VR;
                         lastSendVR = VR;
                         break;
                     case DatagramFormat.UnnumberedControl:
-                        if ((byte)d.APDU.ControlFunction % 2 == 0)
+                        if ((byte)apdu.ControlFunction % 2 == 0)
                         {
                             UIResponsed = false;
                             lastUISentTime = lastSentTime;
@@ -281,7 +283,7 @@ namespace Shouyuan.IEC104
                         break;
                 }
                 sendBuf.Clear();
-                d.SaveTo(sendBuf);
+                apdu.SaveTo(sendBuf);
                 socket.Send(sendBuf.ToArray());
                 if (((VS - ACK) & 0x7fff) >= K)
                     CloseConnection();

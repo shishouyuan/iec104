@@ -30,7 +30,7 @@ namespace GuiZhou104
         {
             InitializeComponent();
             APDU.Format = DatagramFormat.InformationTransmit;
-            var m0 = new Message(ElementTypes.NVA, 3, 1, 0);
+            var m0 = new Message(ElementType.NVA, 3, 1, 0);
             m0.NVA = 0.5f;
             APDU.SendingNumber = 0;
             APDU.RecevingNumber = 10;
@@ -45,13 +45,7 @@ namespace GuiZhou104
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
-            var q = from i in typeof(InfoDatagram).Assembly.GetTypes()
-                    where i.IsSubclassOf(typeof(InfoDatagram)) && !i.IsAbstract
-                    select i;
-            foreach (var i in q)
-            {
-                var l = Activator.CreateInstance(i,new APDU());
-            }
+
         }
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -68,30 +62,26 @@ namespace GuiZhou104
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-
-            try
+            Datagram.ParseAPDU(null);
+                try
             {
                 // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
                 if (node.Socket != null)
                 {
+                    var nva = M_ME_NA_1.SharedInstance;
+                    var apdu = nva.CreateAPDU(1,true);
 
+                    nva.PutData(apdu, 1, (DateTime.Now.Millisecond - 500) / 500.0f,1);
+                    nva.PutData(apdu, 1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
+                    nva.PutData(apdu, 1, 0.7f);
+                    nva.PutData(apdu, 1, 0.8f);
 
-
-                    var dt = new M_ME_NA_1(1, 3);
-
-
-                    dt.PutData(1, 1, (DateTime.Now.Millisecond - 500) / 500.0f);
-                    dt.PutData(2, 1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
-                    dt.PutData(4, 1, 0.7f);
-                    dt.PutData(6, 1, 0.8f);
-
-                    node.SendDatagram(dt);
-                    Title = dt.APDU.ASDU.Messages.First().NVA.ToString() + " " + node.VS + "," + node.VR;
+                    node.SendAPDU(apdu);
                     var list = new List<byte>();
-                    dt.SaveTo(list);
-                    var papdu = new APDU(list.ToArray(), new M_ME_NA_1());
-                    dt = new M_ME_NA_1(papdu);
-                    node.SendDatagram(dt);
+                    apdu.SaveTo(list);
+                    var papdu = Datagram.ParseAPDU(list.ToArray()).APDU;
+                    
+                    node.SendAPDU(papdu);
                 }
 
             }

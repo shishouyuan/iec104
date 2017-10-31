@@ -9,120 +9,204 @@ namespace Shouyuan.IEC104
 
     public abstract class Datagram
     {
-        public readonly APDU APDU;
-        //public virtual DatagramFormat DatagramFormat { get => DatagramFormat.Unknown; }
-        public virtual void SaveTo(List<byte> buf)
-        {
-            APDU.SaveTo(buf);
-        }
-        protected Datagram(APDU apdu)
-        {
-            APDU = apdu;
-        }
-    }
+        public byte ASDUType { get; }
 
-    public class SDatagram : Datagram
-    {
-        public SDatagram() : base(new APDU())
-        {
-            APDU.Format = DatagramFormat.NumberedSupervisory;
-        }
-    }
+        public ElementType ElementType { get; }
+        public byte ExtraLength { get; }
+        public byte TimeStampLength { get; }
+        public byte AddrLength { get; }
 
-    public class UDatagram : Datagram
-    {
-        public UDatagram(ControlFunctions f) : base(new APDU())
-        {
-            APDU.Format = DatagramFormat.UnnumberedControl;
-            APDU.ControlFunction = f;
-        }
-    }
+        public abstract byte DefaultASDUType { get; }
 
 
-    public abstract class InfoDatagram : Datagram
-    {
-
-        public abstract byte ASDUType { get; set; }
-        protected InfoDatagram(byte asduAddr, byte cause) : base(new APDU())
+        protected Datagram(byte atype, ElementType etype, byte extral, byte tsl = 0, byte addrl = 3)
         {
-            APDU.ASDU = new ASDU();
-            APDU.ASDU.Address = asduAddr;
-            APDU.ASDU.Cause = cause;
+            ASDUType = atype;
+            ElementType = etype;
+            ExtraLength = extral;
+            TimeStampLength = tsl;
+            AddrLength = addrl;
         }
 
-        public abstract ElementTypes ElementType { get; }
-        public abstract byte ExtraLength { get; }
-        public abstract byte TimeStampLength { get; }
-        public virtual byte AddrLength { get => 3; }
 
-        protected InfoDatagram(APDU apdu) : base(apdu)
+        protected virtual Message CreateNewMessageWithAddr()
         {
-
-        }
-    }
-
-    public class M_ME_NA_1 : InfoDatagram
-    {
-        public bool SQ { get; }
-        public uint FirstMsgAddr { get; }
-
-        public override  ElementTypes ElementType  =>ElementTypes.NVA;
-
-        public override byte ExtraLength => 1;
-
-        public override byte TimeStampLength => 0;
-
-        public override byte ASDUType { get; set; } = 9;
-
-        public M_ME_NA_1() : base(null)
-        {
-            //ASDUType = 9;
+            return new Message(ElementType, AddrLength, ExtraLength, TimeStampLength);
         }
 
-        public M_ME_NA_1(byte asduAddr, byte cause, uint firstaddr = 0, byte type = 9) : base(asduAddr, cause)
+        protected virtual Message CreateNewMessageNoAddr()
         {
-            APDU.ASDU = new ASDU();
-            APDU.ASDU.Type = type;
-            ASDUType = type;
-            FirstMsgAddr = firstaddr;
-            SQ = firstaddr != 0;
-            APDU.ASDU.SQ = SQ;
+            return new Message(ElementType, 0, ExtraLength, TimeStampLength);
         }
 
-        public void PutData(uint addr, float max, float val, bool iv = false, bool nt = false, bool sb = false, bool bl = false, bool ov = false)
+        protected virtual Message CreateMessageForAPDU(APDU apdu, uint addr)
         {
-            if (SQ)
-                throw new Exception("此方法适用于非顺序发送信息体。");
-
-            var m = new Message( ElementType,AddrLength,ExtraLength,TimeStampLength);
-            m.NVA_M = max;
-            m.NVA = val;
-            m.Address = addr;
-            APDU.ASDU.Messages.Add(m);
-        }
-
-        public void PutSQData(float max, float val, bool iv = false, bool nt = false, bool sb = false, bool bl = false, bool ov = false)
-        {
-            if (!SQ)
-                throw new Exception("此方法适用于顺序发送信息体。");
             Message m;
-            if (APDU.ASDU.Messages.Count == 0)
+            if (addr == 0)
             {
-                m = new Message(ElementType, AddrLength, ExtraLength, TimeStampLength);
-                m.Address = FirstMsgAddr;
+                if (!apdu.ASDU.SQ || apdu.ASDU.ActualMsgCount == 0)
+                    throw new Exception("非顺序信息体或首个信息体地址不能为0");
+                m = CreateNewMessageNoAddr();
             }
             else
             {
-                m = new Message(ElementType, 0, ExtraLength, TimeStampLength);
+                if (apdu.ASDU.SQ && apdu.ASDU.ActualMsgCount > 0)
+                {
+                    if (addr == apdu.ASDU.Messages.Last().Address + 1)
+                        m = CreateNewMessageNoAddr();
+                    else
+                        throw new Exception("顺序信息体地址不连续");
+                }
+                else
+                {
+                    m = CreateNewMessageWithAddr();
+                    m.Address = addr;
+                }
             }
-            m.NVA_M = max;
-            m.NVA = val;
-            APDU.ASDU.Messages.Add(m);
+            return m;
         }
 
-        public M_ME_NA_1(APDU apdu) : base(apdu)
+        public virtual APDU CreateAPDU(byte asduAddr, bool sq = false, bool pn = false, bool test = false)
         {
+            var v = new APDU();
+            v.ASDU = new ASDU();
+            v.ASDU.Address = asduAddr;
+            v.ASDU.SQ = sq;
+            v.ASDU.PN = pn;
+            v.ASDU.Test = test;
+            return v;
+        }
 
+
+        public static readonly Dictionary<byte, Datagram> DefaultDatagrams;
+        static Datagram()
+        {
+            DefaultDatagrams = new Dictionary<byte, Datagram>();
+
+            var a = typeof(Datagram).Assembly;
+
+
+            var q = from i in typeof(Datagram).Assembly.GetTypes()
+                    where i.IsSubclassOf(typeof(Datagram)) && !i.IsAbstract
+                    select i;
+
+            foreach (var i in q)
+            {
+                try
+                {
+                    Datagram d = (Datagram)i.CONSTRU.Invoke(null);
+                    DefaultDatagrams.Add(d.ASDUType, d);
+                }
+                catch (Exception er) { }
+            }
+        }
+
+        public struct ParseResult
+        {
+            public Datagram Datagram;
+            public APDU APDU;
+        }
+
+        public static ParseResult ParseAPDU(byte[] buf, Dictionary<byte, Datagram> datagrams = null)
+        {
+            if (datagrams == null)
+                datagrams = DefaultDatagrams;
+            ParseResult result;
+            result.APDU = null;
+            result.Datagram = null;
+            try
+            {
+                Datagram datagram = null;
+                var APDU = new APDU(buf);
+                var ASDU = new ASDU(buf, APDU.APCILength);
+                if (APDU.Format == DatagramFormat.InformationTransmit)
+                {
+                    if (datagrams.TryGetValue(ASDU.Type, out datagram))
+                    {
+                        byte bi = APDU.APCILength + ASDU.HeaderLength;
+                        if (ASDU.SQ)
+                        {
+                            var m = new Message(datagram.ElementType, datagram.AddrLength, datagram.ExtraLength, datagram.TimeStampLength);
+                            for (int i = 0; i < datagram.AddrLength; i++)
+                                m.Addr[i] = buf[bi++];
+                            for (int i = 0; i < datagram.ElementType.Length(); i++)
+                                m.Element[i] = buf[bi++];
+                            for (int i = 0; i < datagram.ExtraLength; i++)
+                                m.Extra[i] = buf[bi++];
+                            for (int i = 0; i < datagram.TimeStampLength; i++)
+                                m.TimeStamp[i] = buf[bi++];
+                            ASDU.Messages.Add(m);
+                            var addr = m.Address;
+                            for (int k = 1; k < ASDU.MsgCount; k++)
+                            {
+                                m = new Message(datagram.ElementType, 0, datagram.ExtraLength, datagram.TimeStampLength);
+                                m.Address = ++addr;
+                                for (int i = 0; i < datagram.ElementType.Length(); i++)
+                                    m.Element[i] = buf[bi++];
+                                for (int i = 0; i < datagram.ExtraLength; i++)
+                                    m.Extra[i] = buf[bi++];
+                                for (int i = 0; i < datagram.TimeStampLength; i++)
+                                    m.TimeStamp[i] = buf[bi++];
+                                ASDU.Messages.Add(m);
+                            }
+                        }
+                        else
+                        {
+                            for (int k = 0; k < ASDU.MsgCount; k++)
+                            {
+                                var m = new Message(datagram.ElementType, datagram.AddrLength, datagram.ExtraLength, datagram.TimeStampLength);
+                                for (int i = 0; i < datagram.AddrLength; i++)
+                                    m.Addr[i] = buf[bi++];
+                                for (int i = 0; i < datagram.ElementType.Length(); i++)
+                                    m.Element[i] = buf[bi++];
+                                for (int i = 0; i < datagram.ExtraLength; i++)
+                                    m.Extra[i] = buf[bi++];
+                                for (int i = 0; i < datagram.TimeStampLength; i++)
+                                    m.TimeStamp[i] = buf[bi++];
+                                ASDU.Messages.Add(m);
+                            }
+                        }
+                    }
+
+
+                }
+                result.Datagram = datagram;
+                result.APDU = APDU;
+            }
+            catch (Exception) { }
+            return result;
+        }
+    }
+
+    public class M_ME_NA_1 : Datagram
+    {
+
+        public static M_ME_NA_1 SharedInstance;
+
+        public const byte defaultASDUType = 9;
+        public override byte DefaultASDUType => defaultASDUType;
+
+
+        public M_ME_NA_1(byte type = defaultASDUType) : base(type, ElementType.NVA, 1, 0)
+        {
+            if (SharedInstance == null)
+                SharedInstance = this;
+            //ASDUType = 9;
+        }
+
+
+        public void PutData(APDU apdu, float max, float val, uint addr = 0, bool iv = false, bool nt = false, bool sb = false, bool bl = false, bool ov = false)
+        {
+            var m = CreateMessageForAPDU(apdu, addr);
+
+            m.NVA_M = max;
+            m.NVA = val;
+            m.QDS_IV = iv;
+            m.QDS_NT = nt;
+            m.QDS_SB = sb;
+            m.QDS_BL = bl;
+            m.QDS_OV = ov;
+            apdu.ASDU.Messages.Add(m);
         }
     }
 }

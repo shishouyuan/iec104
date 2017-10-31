@@ -35,7 +35,7 @@ namespace Shouyuan.IEC104
     /// <summary>
     /// U格式报文功能
     /// </summary>
-    public enum ControlFunctions : byte
+    public enum ControlFunction : byte
     {
         /// <summary>
         /// 测试命令
@@ -218,26 +218,26 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public ControlFunctions ControlFunction
+        public ControlFunction ControlFunction
         {
             get
             {
                 if (Format != DatagramFormat.UnnumberedControl)
-                    return ControlFunctions.Unknown;
+                    return ControlFunction.Unknown;
                 if ((CTRL1 & 0x4) != 0)
-                    return ControlFunctions.STARTDT_C;
+                    return ControlFunction.STARTDT_C;
                 else if ((CTRL1 & 0x8) != 0)
-                    return ControlFunctions.STARTDT_A;
+                    return ControlFunction.STARTDT_A;
                 else if ((CTRL1 & 0x10) != 0)
-                    return ControlFunctions.STOPDT_C;
+                    return ControlFunction.STOPDT_C;
                 else if ((CTRL1 & 0x20) != 0)
-                    return ControlFunctions.STOPDT_A;
+                    return ControlFunction.STOPDT_A;
                 else if ((CTRL1 & 0x40) != 0)
-                    return ControlFunctions.TESTFR_C;
+                    return ControlFunction.TESTFR_C;
                 else if ((CTRL1 & 0x80) != 0)
-                    return ControlFunctions.TESTFR_A;
+                    return ControlFunction.TESTFR_A;
                 else
-                    return ControlFunctions.Unknown;
+                    return ControlFunction.Unknown;
             }
             set
             {
@@ -245,22 +245,22 @@ namespace Shouyuan.IEC104
                     throw new Exception("仅U格式支持ControlFunctions属性。");
                 switch (value)
                 {
-                    case ControlFunctions.STARTDT_C:
+                    case ControlFunction.STARTDT_C:
                         CTRL1 = 0x4 + 0x3;
                         break;
-                    case ControlFunctions.STARTDT_A:
+                    case ControlFunction.STARTDT_A:
                         CTRL1 = 0x8 + 0x3;
                         break;
-                    case ControlFunctions.STOPDT_C:
+                    case ControlFunction.STOPDT_C:
                         CTRL1 = 0x10 + 0x3;
                         break;
-                    case ControlFunctions.STOPDT_A:
+                    case ControlFunction.STOPDT_A:
                         CTRL1 = 0x20 + 0x3;
                         break;
-                    case ControlFunctions.TESTFR_C:
+                    case ControlFunction.TESTFR_C:
                         CTRL1 = 0x40 + 0x3;
                         break;
-                    case ControlFunctions.TESTFR_A:
+                    case ControlFunction.TESTFR_A:
                         CTRL1 = 0x80 + 0x3;
                         break;
 
@@ -278,65 +278,13 @@ namespace Shouyuan.IEC104
 
         public byte[] InputedBuffer;
 
-        public APDU(byte[] buf, InfoDatagram infoDatagram = null)
+        public APDU(byte[] buf)
         {
             if (buf[0] == Header && buf.Length >= APCILength)
             {
                 InputedBuffer = buf;
                 for (int i = 0; i < APCIValues.Length; i++)
                     APCIValues[i] = buf[i];
-                if (infoDatagram == null)
-                    return;
-                if (Format == DatagramFormat.InformationTransmit)
-                {
-                    ASDU = new ASDU(buf, APCILength);
-                    if (infoDatagram.ASDUType == ASDU.Type)
-                    {
-                        byte bi = APCILength + ASDU.HeaderLength;
-                        if (ASDU.SQ)
-                        {
-                            var m = new Message(infoDatagram.ElementType, infoDatagram.AddrLength, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
-                            for (int i = 0; i < infoDatagram.AddrLength; i++)
-                                m.Addr[i] = buf[bi++];
-                            for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
-                                m.Element[i] = buf[bi++];
-                            for (int i = 0; i < infoDatagram.ExtraLength; i++)
-                                m.Extra[i] = buf[bi++];
-                            for (int i = 0; i < infoDatagram.TimeStampLength; i++)
-                                m.TimeStamp[i] = buf[bi++];
-                            ASDU.Messages.Add(m);
-                            var addr = m.Address;
-                            for (int k = 1; k < ASDU.MsgCount; k++)
-                            {
-                                m = new Message(infoDatagram.ElementType, 0, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
-                                m.Address = ++addr;
-                                for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
-                                    m.Element[i] = buf[bi++];
-                                for (int i = 0; i < infoDatagram.ExtraLength; i++)
-                                    m.Extra[i] = buf[bi++];
-                                for (int i = 0; i < infoDatagram.TimeStampLength; i++)
-                                    m.TimeStamp[i] = buf[bi++];
-                                ASDU.Messages.Add(m);
-                            }
-                        }
-                        else
-                        {
-                            for (int k = 0; k < ASDU.MsgCount; k++)
-                            {
-                                var m = new Message(infoDatagram.ElementType, infoDatagram.AddrLength, infoDatagram.ExtraLength, infoDatagram.TimeStampLength);
-                                for (int i = 0; i < infoDatagram.AddrLength; i++)
-                                    m.Addr[i] = buf[bi++];
-                                for (int i = 0; i < infoDatagram.ElementType.Length(); i++)
-                                    m.Element[i] = buf[bi++];
-                                for (int i = 0; i < infoDatagram.ExtraLength; i++)
-                                    m.Extra[i] = buf[bi++];
-                                for (int i = 0; i < infoDatagram.TimeStampLength; i++)
-                                    m.TimeStamp[i] = buf[bi++];
-                                ASDU.Messages.Add(m);
-                            }
-                        }
-                    }
-                }
             }
             else
             {
