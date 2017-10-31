@@ -17,16 +17,43 @@ namespace Shouyuan.IEC104
 
         public abstract byte DefaultASDUType { get; }
 
+        public virtual string Description { get => "报文格式器。"; }
+
+        /// <summary>
+        /// 创建含地址的信息体。
+        /// </summary>
+        /// <returns></returns>
         protected virtual Message CreateNewMessageWithAddr()
         {
             return new Message(ElementType, AddrLength, ExtraLength, TimeStampLength);
         }
 
+        /// <summary>
+        /// 创建不含地址的信息体。
+        /// </summary>
+        /// <returns></returns>
         protected virtual Message CreateNewMessageNoAddr()
         {
             return new Message(ElementType, 0, ExtraLength, TimeStampLength);
         }
+        protected virtual void SetTime(Message m, DateTime t)
+        {
+            m.Years = (byte)(t.Year % 2000);
+            m.Months = (byte)t.Month;
+            m.Days = (byte)t.Day;
+            m.Hours = (byte)t.Hour;
+            m.Minutes = (byte)t.Minute;
+            m.Seconds = (ushort)t.Second;
+            m.Miliseconds = (ushort)t.Millisecond;
 
+            m.DayInWeek =(byte) t.DayOfWeek;
+        }
+        /// <summary>
+        /// 为指定的APDU创建信息体并返回，但不自动添加进ASDU。
+        /// </summary>
+        /// <param name="apdu">目标APDU</param>
+        /// <param name="addr">信息体地址，为零时创建不含地址的顺序信息体。</param>
+        /// <returns></returns>
         protected virtual Message CreateMessageForAPDU(APDU apdu, uint addr)
         {
             Message m;

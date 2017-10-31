@@ -43,12 +43,16 @@
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
     <Compile Include="DatagramFormatters\M_ME_NA_1.cs" />
-    <Compile Include="DatagramFormatterBase.cs" />
-    <Compile Include="DatagramFormatterManager.cs" />
+    <Compile Include="DatagramFormatters\DatagramFormatterBase.cs" />
+    <Compile Include="DatagramFormatters\DatagramFormatterManager.cs" />
+    <Compile Include="DatagramFormatters\M_ME_NB_1.cs" />
+    <Compile Include="DatagramFormatters\M_ME_NC_1.cs" />
+    <Compile Include="DatagramFormatters\M_ME_TD_1.cs" />
+    <Compile Include="DatagramFormatters\M_ME_TE_1.cs" />
+    <Compile Include="DatagramFormatters\M_ME_TF_1.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Node.cs" />
-    <Compile Include="Slave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

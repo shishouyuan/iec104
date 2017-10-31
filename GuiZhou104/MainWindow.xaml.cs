@@ -62,25 +62,23 @@ namespace GuiZhou104
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
-           
-                try
+            try
             {
-                // s.linkSocket.Send(new byte[] { 0x68, 0x0E, 0x00, 0x00, 0x02, 0x00, 0x64, 0x01, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x14 });
                 if (node.Socket != null)
                 {
-                    var nva =(M_ME_NA_1) node.Datagram.GetInstance(typeof(M_ME_NA_1));
-                    var apdu = nva.CreateAPDU(1,true);
+                    var nva = (M_ME_TD_1)node.Datagram.GetInstance(typeof(M_ME_TD_1));
+                    var apdu = nva.CreateAPDU(1, true);
 
-                    nva.PutData(apdu, 1, (DateTime.Now.Millisecond - 500) / 500.0f,1);
-                    nva.PutData(apdu, 1, (DateTime.Now.Millisecond - 500 + 5) / 500.0f);
-                    nva.PutData(apdu, 1, 0.7f);
-                    nva.PutData(apdu, 1, 0.8f);
+                    nva.PutData(apdu, 1, 0.8f, DateTime.Now, 1);
+                    nva.PutData(apdu, 1, -0.8f, DateTime.Now);
+                    nva.PutData(apdu, 1, 0.2f, DateTime.Now);
+                    nva.PutData(apdu, 1, 0.3f, DateTime.Now);
 
                     node.SendAPDU(apdu);
                     var list = new List<byte>();
                     apdu.SaveTo(list);
                     var papdu = node.Datagram.ParseAPDU(list.ToArray()).APDU;
-                    
+
                     node.SendAPDU(papdu);
                 }
 

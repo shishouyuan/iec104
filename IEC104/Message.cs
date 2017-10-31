@@ -203,7 +203,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public ushort MiliSeconds
+        public ushort Miliseconds
         {
             get
             {

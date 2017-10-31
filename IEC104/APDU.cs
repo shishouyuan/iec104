@@ -270,17 +270,17 @@ namespace Shouyuan.IEC104
 
         #endregion
 
-        public readonly DatagramFormatterBase Datagram;
-        public APDU(DatagramFormatterBase datagram = null)
+        public readonly DatagramFormatterBase Formatter;
+        public APDU(DatagramFormatterBase formatter = null)
         {
-            Datagram = datagram;
+            Formatter = formatter;
             APCIValues[0] = Header;
 
         }
 
-        public APDU(byte[] buf, DatagramFormatterBase datagram = null)
+        public APDU(byte[] buf, DatagramFormatterBase formatter = null)
         {
-            Datagram = datagram;
+            Formatter = formatter;
             if (buf[0] == Header && buf.Length >= APCILength)
             {
                 for (int i = 0; i < APCIValues.Length; i++)

@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("GuiZhou104")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Shi Shouyuan")]
 [assembly: AssemblyProduct("GuiZhou104")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright © Shi Shouyuan  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

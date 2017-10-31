@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace Shouyuan.IEC104
 {
+    /// <summary>
+    /// 报文格式器管理器，利用反射从程序集加载所有格式器，使用相应的格式器解析报文。
+    /// </summary>
     public class DatagramFormatterManager
     {
+        /// <summary>
+        /// 所有格式器的词典，键为格式器对应的类型号。
+        /// </summary>
         public readonly Dictionary<byte, DatagramFormatterBase> DefaultDatagrams = new Dictionary<byte, DatagramFormatterBase>();
+        /// <summary>
+        /// 从程序集加载所有格式器到DefaultDatagrams。
+        /// </summary>
         public void LoadFromAssembly()
         {
             DefaultDatagrams.Clear();
@@ -33,6 +42,11 @@ namespace Shouyuan.IEC104
             LoadFromAssembly();
         }
 
+        /// <summary>
+        /// 获取对应格式器的实例。
+        /// </summary>
+        /// <param name="t">格式器的类型</param>
+        /// <returns></returns>
         public DatagramFormatterBase GetInstance(Type t)
         {
             var q = from i in DefaultDatagrams.Values
@@ -50,10 +64,16 @@ namespace Shouyuan.IEC104
             public APDU APDU;
         }
 
-        public ParseResult ParseAPDU(byte[] buf, Dictionary<byte, DatagramFormatterBase> datagrams = null)
+        /// <summary>
+        /// 使用默认或指定的格式器组解析报文。
+        /// </summary>
+        /// <param name="buf">报文数据</param>
+        /// <param name="formatters">指定格式器组</param>
+        /// <returns></returns>
+        public ParseResult ParseAPDU(byte[] buf, Dictionary<byte, DatagramFormatterBase> formatters = null)
         {
-            if (datagrams == null)
-                datagrams = DefaultDatagrams;
+            if (formatters == null)
+                formatters = DefaultDatagrams;
             ParseResult result;
             result.APDU = null;
             result.Datagram = null;
@@ -66,7 +86,7 @@ namespace Shouyuan.IEC104
 
                 if (APDU.Format == DatagramFormat.InformationTransmit)
                 {
-                    if (datagrams.TryGetValue(ASDU.Type, out datagram))
+                    if (formatters.TryGetValue(ASDU.Type, out datagram))
                     {
                         byte bi = APDU.APCILength + ASDU.HeaderLength;
                         if (ASDU.SQ)
