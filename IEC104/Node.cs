@@ -291,7 +291,7 @@ namespace Shouyuan.IEC104
 
         }
 
-        public DatagramFormatterManager Datagram = new DatagramFormatterManager();
+        public DatagramFormatterManager FormatterManager = new DatagramFormatterManager();
 
 
     }

@@ -440,6 +440,15 @@ namespace Shouyuan.IEC104
         }
         #endregion
 
+        public byte QOIi = 0;
+        public const byte QOI_WholeStation = 20;
+        public byte QOI
+        {
+            get => Extra[QOIi];
+            set => Extra[QOIi] = value;
+        }
+
+
         private bool CheckType(ElementType t, bool err = true)
         {
             if (t == Type)

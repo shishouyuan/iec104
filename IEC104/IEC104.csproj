@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="APDU.cs" />
     <Compile Include="ASDU.cs" />
+    <Compile Include="DatagramFormatters\C_IC_NA_1.cs" />
+    <Compile Include="DatagramFormatters\C_RD_NA_1.cs" />
     <Compile Include="DatagramFormatters\M_ME_NA_1.cs" />
     <Compile Include="DatagramFormatters\DatagramFormatterBase.cs" />
     <Compile Include="DatagramFormatters\DatagramFormatterManager.cs" />

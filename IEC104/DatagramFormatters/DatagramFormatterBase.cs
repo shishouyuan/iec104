@@ -93,7 +93,7 @@ namespace Shouyuan.IEC104
             return v;
         }
 
-        protected DatagramFormatterBase(byte atype, ElementType etype, byte extral, byte tsl = 0, byte addrl = 3)
+        protected DatagramFormatterBase(byte atype, ElementType etype, byte extral=0, byte tsl = 0, byte addrl = 3)
         {
             ASDUType = atype;
             ElementType = etype;

@@ -66,20 +66,20 @@ namespace GuiZhou104
             {
                 if (node.Socket != null)
                 {
-                    var nva = (M_ME_TD_1)node.Datagram.GetInstance(typeof(M_ME_TD_1));
-                    var apdu = nva.CreateAPDU(1, true);
+                    var nva = (M_ME_TD_1)node.FormatterManager.GetInstance(typeof(M_ME_TD_1));
+                    var apdu = nva.CreateAPDU(1);
 
                     nva.PutData(apdu, 1, 0.8f, DateTime.Now, 1);
-                    nva.PutData(apdu, 1, -0.8f, DateTime.Now);
-                    nva.PutData(apdu, 1, 0.2f, DateTime.Now);
-                    nva.PutData(apdu, 1, 0.3f, DateTime.Now);
+                    nva.PutData(apdu, 1, -0.8f, DateTime.Now, 2);
+                    nva.PutData(apdu, 1, 0.2f, DateTime.Now, 3);
+                    nva.PutData(apdu, 1, 0.3f, DateTime.Now, 4);
 
                     node.SendAPDU(apdu);
-                    var list = new List<byte>();
-                    apdu.SaveTo(list);
-                    var papdu = node.Datagram.ParseAPDU(list.ToArray()).APDU;
 
-                    node.SendAPDU(papdu);
+                    var cic = (C_RD_NA_1)node.FormatterManager.GetInstance(typeof(C_RD_NA_1));
+
+
+                    node.SendAPDU(cic.Create(1, 1));
                 }
 
             }
@@ -100,6 +100,30 @@ namespace GuiZhou104
                 node.StartReceive();
                 listenSocket.Dispose();
                 listenSocket = null;
+            }
+        }
+
+        APDU tosend;
+        private void addValueButton_Click(object sender, RoutedEventArgs e)
+        {
+            var f = (M_ME_TF_1)node.FormatterManager.GetInstance(typeof(M_ME_TF_1));
+            if (tosend == null)
+                tosend = f.CreateAPDU(1);
+            try
+            {
+
+                f.PutData(tosend, Convert.ToSingle(valTextbox.Text), DateTime.Now, Convert.ToUInt32(MsgAddrTextbox.Text));
+            }
+            catch (Exception er) { }
+
+        }
+
+        private void sendValueButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (tosend != null)
+            {
+                node.SendAPDU(tosend);
+                tosend = null;
             }
         }
     }
