@@ -5,18 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GuiZhou104"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525"
+        >
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition  Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Name="StateTextblock"/>
-        <Button Content="Send" Click="Button_Click" Grid.Row="1"/>
-        <Button Grid.Row="2" Content="Connect" Click="Button_Click_1"/>
-        <TabControl Grid.Row="3" >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                
+                    <local:Conv x:Key="conv"/>
+            </Grid.Resources>
+            <TextBlock Margin="5" Text="{Binding Title,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}" />
+            <Button Width="{Binding ActualHeight,RelativeSource={RelativeSource Self}}" Grid.Column="2" FontFamily="Webdings" Click="minBtn_Click" Content="0" Background="Transparent"/>
+            <Button Width="{Binding ActualHeight,RelativeSource={RelativeSource Self}}" Grid.Column="3" FontFamily="Webdings" 
+                    Content="{Binding Path=WindowState,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window},Converter={StaticResource ResourceKey=conv}}" Click="maxBtn_Click" Background="Transparent"/>
+
+            <Button Width="{Binding ActualHeight,RelativeSource={RelativeSource Self}}" Grid.Column="4" FontFamily="Webdings" Click="closeBtn_Click" Content="r" Background="Transparent"/>
+
+
+        </Grid>
+        <RichTextBox Name="StateTextblock" Grid.Row="1"/>
+        <Button Content="Send" Click="Button_Click" Grid.Row="2"/>
+        <Button Grid.Row="3" Content="Connect" Click="Button_Click_1"/>
+        <TabControl Grid.Row="4" >
             <TabItem Header="短浮点长时标">
                 <Grid>
                     <Grid.RowDefinitions>

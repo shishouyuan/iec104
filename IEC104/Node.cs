@@ -46,7 +46,7 @@ namespace Shouyuan.IEC104
         private DateTime lastSentTime;
         private DateTime lastUISentTime;
 
-        public delegate void NewDatagramEventHandler(DatagramFormatterManager d, Node sender);
+        public delegate void NewDatagramEventHandler(APDU d, Node sender);
         public event NewDatagramEventHandler NewDatagram;
 
         public delegate void ConnectionLostEventHandler(Node sender);
@@ -72,8 +72,8 @@ namespace Shouyuan.IEC104
         {
             lastRevTime = DateTime.Now;
             testDatagramSentInCycle = false;
-            var a = new APDU(data);
-
+            var a = FormatterManager.ParseAPDU(data).APDU;
+            if (a == null) return;
             switch (a.Format)
             {
                 case DatagramFormat.InformationTransmit:
@@ -95,6 +95,7 @@ namespace Shouyuan.IEC104
                         UIResponsed = true;
                     break;
             }
+            if (NewDatagram != null) NewDatagram(a,this);
         }
 
         private void ReceiveLoop(object obj)

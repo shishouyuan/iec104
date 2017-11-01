@@ -93,6 +93,25 @@ namespace Shouyuan.IEC104
             return v;
         }
 
+        public virtual String GetBriefing (APDU apdu)
+        {
+            var sb = new StringBuilder();
+            switch (apdu.Format)
+            {
+                case DatagramFormat.NumberedSupervisory:
+                    sb.AppendFormat("S格式报文：序号{0}。\n",apdu.RecevingNumber);
+                    break;
+                case DatagramFormat.UnnumberedControl:
+                    sb.AppendFormat("U格式报文：{0}\n", apdu.ControlFunction);
+                    break;
+                case DatagramFormat.InformationTransmit:
+                    sb.AppendFormat("I格式报文：\n");
+                    break;
+            }
+            return sb.ToString();
+        }
+
+
         protected DatagramFormatterBase(byte atype, ElementType etype, byte extral=0, byte tsl = 0, byte addrl = 3)
         {
             ASDUType = atype;

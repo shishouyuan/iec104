@@ -270,7 +270,7 @@ namespace Shouyuan.IEC104
 
         #endregion
 
-        public readonly DatagramFormatterBase Formatter;
+        public DatagramFormatterBase Formatter;
         public APDU(DatagramFormatterBase formatter = null)
         {
             Formatter = formatter;

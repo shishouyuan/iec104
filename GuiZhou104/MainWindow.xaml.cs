@@ -15,11 +15,27 @@ using System.Windows.Shapes;
 using Shouyuan.IEC104;
 using System.Net.Sockets;
 using System.Net;
+using System.Globalization;
 
 namespace GuiZhou104
 {
 
+    public class Conv : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            WindowState s = (WindowState)value;
+            if (s == WindowState.Maximized)
+                return "2";
+            else
+                return "1";
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
@@ -46,11 +62,81 @@ namespace GuiZhou104
             timer.Start();
 
 
+            node.NewDatagram += Node_NewDatagram;
+
+            this.WindowStyle = WindowStyle.None;
+            this.ResizeMode = ResizeMode.CanResizeWithGrip;
+            this.AllowsTransparency = true;
+            this.BorderThickness = new Thickness(0);
+            this.OpacityMask = new LinearGradientBrush(Color.FromArgb(200, 0, 0, 0), Colors.White, 45);
+            this.MouseDown += ((object b, MouseButtonEventArgs a) =>
+            {
+                if (a.LeftButton == MouseButtonState.Pressed)
+                    //  ResizeMode = ResizeMode.CanMinimize;
+                    this.DragMove();
+            });
+            this.MouseDoubleClick += ((object o, MouseButtonEventArgs e) =>
+              {
+                  this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+              });
+        }
+
+        void addToStateDisplay(Paragraph p)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                StateTextblock.Document.Blocks.Add(p);
+            });
+        }
+
+
+        private void Node_NewDatagram(APDU d, Node sender)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                var sb = new StringBuilder();
+                var p = new Paragraph() { Margin = new Thickness(5) };
+                p.Inlines.Add(new Run(DateTime.Now.ToString()));
+                p.Inlines.Add(" 接收");
+                p.Inlines.Add(new LineBreak());
+
+
+                switch (d.Format)
+                {
+                    case DatagramFormat.NumberedSupervisory:
+                        p.Inlines.Add(new Run("S格式报文：接收序号：") { Foreground = Brushes.DarkBlue });
+                        p.Inlines.Add(new Run(d.RecevingNumber.ToString()) { Foreground = Brushes.Blue });
+                        break;
+                    case DatagramFormat.UnnumberedControl:
+                        p.Inlines.Add(new Run("U格式报文：") { Foreground = Brushes.Brown });
+                        p.Inlines.Add(new Run(d.ControlFunction.ToString()) { Foreground = Brushes.Blue });
+                        break;
+                    case DatagramFormat.InformationTransmit:
+
+                        p.Inlines.Add(new Run("I格式报文：发送序号：") { Foreground = Brushes.Green });
+                        p.Inlines.Add(new Run(d.SendingNumber.ToString()) { Foreground = Brushes.Blue });
+                        p.Inlines.Add(new Run("、接收序号：") { Foreground = Brushes.Green });
+                        p.Inlines.Add(new Run(d.RecevingNumber.ToString()) { Foreground = Brushes.Blue });
+                        p.Inlines.Add(new LineBreak());
+                        p.Inlines.Add(new Run("报文类型：") { Foreground = Brushes.Gray });
+                        p.Inlines.Add(new Run(d.Formatter.GetType().Name) { Foreground = Brushes.Blue });
+                        p.Inlines.Add(new Run(" | ") { Foreground = Brushes.Gray });
+                        p.Inlines.Add(new Run(d.Formatter.Description) { Foreground = Brushes.Blue });
+                        break;
+                }
+
+                addToStateDisplay(p);
+
+
+
+
+            }
+            );
         }
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() => { Title = "S " + node.VS + ",V" + node.VR + ",A" + node.ACK; });
+            Dispatcher.InvokeAsync(() => { Title = "S " + node.VS + ",V" + node.VR + ",A" + node.ACK; });
 
         }
 
@@ -120,11 +206,28 @@ namespace GuiZhou104
 
         private void sendValueButton_Click(object sender, RoutedEventArgs e)
         {
+
             if (tosend != null)
             {
                 node.SendAPDU(tosend);
                 tosend = null;
             }
+        }
+
+        private void minBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void maxBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = this.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
+        }
+
+        private void closeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

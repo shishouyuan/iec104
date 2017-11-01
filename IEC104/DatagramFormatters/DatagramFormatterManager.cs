@@ -79,38 +79,39 @@ namespace Shouyuan.IEC104
             result.Datagram = null;
             try
             {
-                DatagramFormatterBase datagram = null;
+                DatagramFormatterBase formatter = null;
                 var APDU = new APDU(buf);
                 var ASDU = new ASDU(buf, APDU.APCILength);
                 APDU.ASDU = ASDU;
 
                 if (APDU.Format == DatagramFormat.InformationTransmit)
                 {
-                    if (formatters.TryGetValue(ASDU.Type, out datagram))
+                    if (formatters.TryGetValue(ASDU.Type, out formatter))
                     {
+                        APDU.Formatter = formatter;
                         byte bi = APDU.APCILength + ASDU.HeaderLength;
                         if (ASDU.SQ)
                         {
-                            var m = new Message(datagram.ElementType, datagram.AddrLength, datagram.ExtraLength, datagram.TimeStampLength);
-                            for (int i = 0; i < datagram.AddrLength; i++)
+                            var m = new Message(formatter.ElementType, formatter.AddrLength, formatter.ExtraLength, formatter.TimeStampLength);
+                            for (int i = 0; i < formatter.AddrLength; i++)
                                 m.Addr[i] = buf[bi++];
-                            for (int i = 0; i < datagram.ElementType.Length(); i++)
+                            for (int i = 0; i < formatter.ElementType.Length(); i++)
                                 m.Element[i] = buf[bi++];
-                            for (int i = 0; i < datagram.ExtraLength; i++)
+                            for (int i = 0; i < formatter.ExtraLength; i++)
                                 m.Extra[i] = buf[bi++];
-                            for (int i = 0; i < datagram.TimeStampLength; i++)
+                            for (int i = 0; i < formatter.TimeStampLength; i++)
                                 m.TimeStamp[i] = buf[bi++];
                             ASDU.Messages.Add(m);
                             var addr = m.Address;
                             for (int k = 1; k < ASDU.MsgCount; k++)
                             {
-                                m = new Message(datagram.ElementType, 0, datagram.ExtraLength, datagram.TimeStampLength);
+                                m = new Message(formatter.ElementType, 0, formatter.ExtraLength, formatter.TimeStampLength);
                                 m.Address = ++addr;
-                                for (int i = 0; i < datagram.ElementType.Length(); i++)
+                                for (int i = 0; i < formatter.ElementType.Length(); i++)
                                     m.Element[i] = buf[bi++];
-                                for (int i = 0; i < datagram.ExtraLength; i++)
+                                for (int i = 0; i < formatter.ExtraLength; i++)
                                     m.Extra[i] = buf[bi++];
-                                for (int i = 0; i < datagram.TimeStampLength; i++)
+                                for (int i = 0; i < formatter.TimeStampLength; i++)
                                     m.TimeStamp[i] = buf[bi++];
                                 ASDU.Messages.Add(m);
                             }
@@ -119,14 +120,14 @@ namespace Shouyuan.IEC104
                         {
                             for (int k = 0; k < ASDU.MsgCount; k++)
                             {
-                                var m = new Message(datagram.ElementType, datagram.AddrLength, datagram.ExtraLength, datagram.TimeStampLength);
-                                for (int i = 0; i < datagram.AddrLength; i++)
+                                var m = new Message(formatter.ElementType, formatter.AddrLength, formatter.ExtraLength, formatter.TimeStampLength);
+                                for (int i = 0; i < formatter.AddrLength; i++)
                                     m.Addr[i] = buf[bi++];
-                                for (int i = 0; i < datagram.ElementType.Length(); i++)
+                                for (int i = 0; i < formatter.ElementType.Length(); i++)
                                     m.Element[i] = buf[bi++];
-                                for (int i = 0; i < datagram.ExtraLength; i++)
+                                for (int i = 0; i < formatter.ExtraLength; i++)
                                     m.Extra[i] = buf[bi++];
-                                for (int i = 0; i < datagram.TimeStampLength; i++)
+                                for (int i = 0; i < formatter.TimeStampLength; i++)
                                     m.TimeStamp[i] = buf[bi++];
                                 ASDU.Messages.Add(m);
                             }
@@ -135,7 +136,7 @@ namespace Shouyuan.IEC104
 
 
                 }
-                result.Datagram = datagram;
+                result.Datagram = formatter;
                 result.APDU = APDU;
             }
             catch (Exception) { }
