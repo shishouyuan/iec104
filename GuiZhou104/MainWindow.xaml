@@ -15,7 +15,7 @@
             <RowDefinition  Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Name="TitleGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -36,7 +36,7 @@
 
 
         </Grid>
-        <RichTextBox Name="StateTextblock" Grid.Row="1"/>
+        <RichTextBox Name="StateTextblock" Grid.Row="1" IsReadOnly="True" FontSize="12" VerticalScrollBarVisibility="Auto"/>
         <Button Content="Send" Click="Button_Click" Grid.Row="2"/>
         <Button Grid.Row="3" Content="Connect" Click="Button_Click_1"/>
         <TabControl Grid.Row="4" >
@@ -47,7 +47,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition  />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>

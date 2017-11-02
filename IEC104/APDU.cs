@@ -147,6 +147,9 @@ namespace Shouyuan.IEC104
             set => APCIValues[5] = value;
         }
 
+        public DateTime TransferTime { get; set; }
+
+
         public DatagramFormat Format
         {
             get
@@ -277,6 +280,7 @@ namespace Shouyuan.IEC104
             APCIValues[0] = Header;
 
         }
+
 
         public APDU(byte[] buf, DatagramFormatterBase formatter = null)
         {

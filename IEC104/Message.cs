@@ -203,7 +203,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public ushort Miliseconds
+        public ushort Milisecond
         {
             get
             {
@@ -236,7 +236,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public ushort Seconds
+        public ushort Second
         {
             get
             {
@@ -261,7 +261,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public byte Minutes
+        public byte Minute
         {
             get
             {
@@ -295,7 +295,7 @@ namespace Shouyuan.IEC104
                     TimeStamp[2] = value ? TimeStamp[2].SetBit(7) : TimeStamp[2].ClearBit(7);
             }
         }
-        public byte Hours
+        public byte Hour
         {
             get
             {
@@ -316,7 +316,7 @@ namespace Shouyuan.IEC104
         }
 
 
-        public byte Days
+        public byte Day
         {
             get
             {
@@ -352,7 +352,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public byte Months
+        public byte Month
         {
             get
             {
@@ -370,7 +370,7 @@ namespace Shouyuan.IEC104
             }
         }
 
-        public byte Years
+        public byte Year
         {
             get
             {

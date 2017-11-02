@@ -49,6 +49,9 @@ namespace Shouyuan.IEC104
         public delegate void NewDatagramEventHandler(APDU d, Node sender);
         public event NewDatagramEventHandler NewDatagram;
 
+        public delegate void DatagramSendingEventHandler(APDU d, Node sender);
+        public event DatagramSendingEventHandler DatagramSending;
+
         public delegate void ConnectionLostEventHandler(Node sender);
         public event ConnectionLostEventHandler ConnectionLost;
 
@@ -67,13 +70,14 @@ namespace Shouyuan.IEC104
         public ushort ACK { get => ack; private set => ack = (ushort)(value % MAX); }
 
 
-
         private void HandleData(byte[] data)
         {
             lastRevTime = DateTime.Now;
             testDatagramSentInCycle = false;
             var a = FormatterManager.ParseAPDU(data).APDU;
             if (a == null) return;
+            a.TransferTime =lastRevTime;  
+            ThreadPool.QueueUserWorkItem((object o) => { if (NewDatagram != null) NewDatagram(a, this); });  
             switch (a.Format)
             {
                 case DatagramFormat.InformationTransmit:
@@ -94,8 +98,7 @@ namespace Shouyuan.IEC104
                     else
                         UIResponsed = true;
                     break;
-            }
-            if (NewDatagram != null) NewDatagram(a,this);
+            }         
         }
 
         private void ReceiveLoop(object obj)
@@ -261,6 +264,9 @@ namespace Shouyuan.IEC104
             if (socket == null) return;
             lock (this)
             {
+                apdu.TransferTime = DateTime.Now;
+                if (DatagramSending != null)
+                    DatagramSending(apdu, this);
                 lastSentTime = DateTime.Now;
                 switch (apdu.Format)
                 {

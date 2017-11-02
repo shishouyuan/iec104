@@ -81,11 +81,11 @@ namespace Shouyuan.IEC104
             {
                 DatagramFormatterBase formatter = null;
                 var APDU = new APDU(buf);
-                var ASDU = new ASDU(buf, APDU.APCILength);
-                APDU.ASDU = ASDU;
 
                 if (APDU.Format == DatagramFormat.InformationTransmit)
                 {
+                    var ASDU = new ASDU(buf, APDU.APCILength);
+                    APDU.ASDU = ASDU;
                     if (formatters.TryGetValue(ASDU.Type, out formatter))
                     {
                         APDU.Formatter = formatter;

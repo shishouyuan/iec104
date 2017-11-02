@@ -14,7 +14,7 @@ namespace Shouyuan.IEC104
         public const byte defaultASDUType = 13;
         public override byte DefaultASDUType => defaultASDUType;
 
-        public override string Description => "短浮点数报文格式。";
+        public override string Description => "短浮点数报文格式";
 
         public M_ME_NC_1(byte type = defaultASDUType) : base(type, ElementType.R, 1)
         {

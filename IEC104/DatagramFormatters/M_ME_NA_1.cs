@@ -14,7 +14,7 @@ namespace Shouyuan.IEC104
         public const byte defaultASDUType = 9;
         public override byte DefaultASDUType => defaultASDUType;
 
-        public override string Description => "归一化遥测报文格式。";
+        public override string Description => "归一化遥测报文格式";
 
         public M_ME_NA_1(byte type = defaultASDUType) : base(type, ElementType.NVA, 1)
         {

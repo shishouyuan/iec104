@@ -14,7 +14,7 @@ namespace Shouyuan.IEC104
         public const byte defaultASDUType = 36;
         public override byte DefaultASDUType => defaultASDUType;
 
-        public override string Description => "带长时标的短浮点测量值报文格式。";
+        public override string Description => "带长时标的短浮点测量值报文格式";
 
         public M_ME_TF_1(byte type = defaultASDUType) : base(type, ElementType.R, 1, 7)
         {

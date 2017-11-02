@@ -14,7 +14,7 @@ namespace Shouyuan.IEC104
         public const byte defaultASDUType = 9;
         public override byte DefaultASDUType => defaultASDUType;
 
-        public override string Description => "标度化测量值报文格式。";
+        public override string Description => "标度化测量值报文格式";
 
         public M_ME_NB_1(byte type = defaultASDUType) : base(type, ElementType.SVA, 1)
         {

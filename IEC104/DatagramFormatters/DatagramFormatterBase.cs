@@ -38,13 +38,13 @@ namespace Shouyuan.IEC104
         }
         protected virtual void SetTime(Message m, DateTime t)
         {
-            m.Years = (byte)(t.Year % 2000);
-            m.Months = (byte)t.Month;
-            m.Days = (byte)t.Day;
-            m.Hours = (byte)t.Hour;
-            m.Minutes = (byte)t.Minute;
-            m.Seconds = (ushort)t.Second;
-            m.Miliseconds = (ushort)t.Millisecond;
+            m.Year = (byte)(t.Year % 2000);
+            m.Month = (byte)t.Month;
+            m.Day = (byte)t.Day;
+            m.Hour = (byte)t.Hour;
+            m.Minute = (byte)t.Minute;
+            m.Second = (ushort)t.Second;
+            m.Milisecond = (ushort)t.Millisecond;
 
             m.DayInWeek =(byte) t.DayOfWeek;
         }
@@ -92,26 +92,7 @@ namespace Shouyuan.IEC104
             v.ASDU.Test = test;
             return v;
         }
-
-        public virtual String GetBriefing (APDU apdu)
-        {
-            var sb = new StringBuilder();
-            switch (apdu.Format)
-            {
-                case DatagramFormat.NumberedSupervisory:
-                    sb.AppendFormat("S格式报文：序号{0}。\n",apdu.RecevingNumber);
-                    break;
-                case DatagramFormat.UnnumberedControl:
-                    sb.AppendFormat("U格式报文：{0}\n", apdu.ControlFunction);
-                    break;
-                case DatagramFormat.InformationTransmit:
-                    sb.AppendFormat("I格式报文：\n");
-                    break;
-            }
-            return sb.ToString();
-        }
-
-
+        
         protected DatagramFormatterBase(byte atype, ElementType etype, byte extral=0, byte tsl = 0, byte addrl = 3)
         {
             ASDUType = atype;

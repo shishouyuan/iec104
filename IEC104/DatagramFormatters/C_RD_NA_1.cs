@@ -11,7 +11,7 @@ namespace Shouyuan.IEC104
         public const byte defaultASDUType = 102;
         public override byte DefaultASDUType => defaultASDUType;
 
-        public override string Description => "带长时标的标度化测量值报文格式。";
+        public override string Description => "召唤单个数据";
 
         public C_RD_NA_1(byte type = defaultASDUType) : base(type, ElementType.Empty)
         {
