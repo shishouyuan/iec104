@@ -192,6 +192,8 @@ namespace GuiZhou104
                                     p.Inlines.Add(new Run(d.Formatter.GetType().Name) { Foreground = Brushes.Blue });
                                     p.Inlines.Add(new Run(" | ") { Foreground = Brushes.Gray });
                                     p.Inlines.Add(new Run(d.Formatter.Description) { Foreground = Brushes.Blue });
+                                    p.Inlines.Add(new Run("，服务地址：") { Foreground = Brushes.Gray });
+                                    p.Inlines.Add(new Run(d.ASDU.Address.ToString()) { Foreground = Brushes.Blue });
                                     p.Inlines.Add(new Run("，传送原因：") { Foreground = Brushes.Gray });
                                     p.Inlines.Add(new Run(d.ASDU.Cause.ToString()) { Foreground = Brushes.Blue });
                                     p.Inlines.Add(new Run("，P/N：") { Foreground = Brushes.Gray });
@@ -255,7 +257,7 @@ namespace GuiZhou104
 
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            Dispatcher.InvokeAsync(() => { Title = "S " + node.VS + ",V" + node.VR + ",A" + node.ACK; });
+            Dispatcher.InvokeAsync(() => { Title = "S" + node.VS + ",V" + node.VR + ",A" + node.ACK; });
 
         }
 
@@ -416,8 +418,14 @@ namespace GuiZhou104
                 tosend = f.CreateAPDU(1);
             try
             {
+                var t = DateTime.Now;
+                if (UseNowCheckbox.IsChecked != true&&DateToSendPicker.SelectedDate.HasValue)
+                {
+                    t = DateToSendPicker.SelectedDate.Value;
+                    t = new DateTime(t.Year, t.Month, t.Day, int.Parse(HourTextbox.Text), int.Parse(MinuteTextbox.Text), int.Parse(SecondTextbox.Text));
+                }
 
-                f.PutData(tosend, Convert.ToSingle(valTextbox.Text), DateTime.Now, Convert.ToUInt32(MsgAddrTextbox.Text));
+                f.PutData(tosend, Convert.ToSingle(valTextbox.Text), t, Convert.ToUInt32(MsgAddrTextbox.Text));
             }
             catch (Exception er) { }
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GuiZhou104"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MainWindow" Height="450" Width="800"
         >
     <Grid>
         <Grid.RowDefinitions>
@@ -90,6 +90,12 @@
                     <Button Name="sendValueButton" Content="发送" Click="sendValueButton_Click" Grid.Column="2" Grid.Row="1"/>
 
                 </Grid>
+            </TabItem>
+            <TabItem Header="总召唤">
+
+            </TabItem>
+            <TabItem Header="。。。">
+
             </TabItem>
         </TabControl>
     </Grid>
