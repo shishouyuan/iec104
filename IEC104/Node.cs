@@ -76,8 +76,8 @@ namespace Shouyuan.IEC104
             testDatagramSentInCycle = false;
             var a = FormatterManager.ParseAPDU(data).APDU;
             if (a == null) return;
-            a.TransferTime =lastRevTime;  
-            ThreadPool.QueueUserWorkItem((object o) => { if (NewDatagram != null) NewDatagram(a, this); });  
+            a.TransferTime = lastRevTime;
+            if (NewDatagram != null) NewDatagram(a, this);
             switch (a.Format)
             {
                 case DatagramFormat.InformationTransmit:
@@ -98,7 +98,7 @@ namespace Shouyuan.IEC104
                     else
                         UIResponsed = true;
                     break;
-            }         
+            }
         }
 
         private void ReceiveLoop(object obj)
@@ -291,7 +291,15 @@ namespace Shouyuan.IEC104
                 }
                 sendBuf.Clear();
                 apdu.SaveTo(sendBuf);
-                socket.Send(sendBuf.ToArray());
+                try
+                {
+                    socket.Send(sendBuf.ToArray());
+                }
+                catch (Exception)
+                {
+                    CloseConnection();
+                    return;
+                }
                 if (((VS - ACK) & 0x7fff) >= K)
                     CloseConnection();
             }
