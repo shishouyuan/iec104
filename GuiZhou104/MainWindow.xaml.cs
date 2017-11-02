@@ -401,8 +401,16 @@ namespace GuiZhou104
             try
             {
                 isMaster = false;
+                var q = from i in System.Net.Dns.GetHostAddresses(System.Net.Dns.GetHostName())
+                        where i.AddressFamily == AddressFamily.InterNetwork
+                        select i;
+                ipTextbox.Clear();
+                foreach (var i in q)
+                {
+                    ipTextbox.AppendText(i.ToString());
+                    ipTextbox.AppendText("|");
+                }
                 remoteAddr = "localhost";
-                ipTextbox.Text = remoteAddr;
                 remotePort = int.Parse(portTextbox.Text);
                 StartAccept();
             }
@@ -419,7 +427,7 @@ namespace GuiZhou104
             try
             {
                 var t = DateTime.Now;
-                if (UseNowCheckbox.IsChecked != true&&DateToSendPicker.SelectedDate.HasValue)
+                if (UseNowCheckbox.IsChecked != true && DateToSendPicker.SelectedDate.HasValue)
                 {
                     t = DateToSendPicker.SelectedDate.Value;
                     t = new DateTime(t.Year, t.Month, t.Day, int.Parse(HourTextbox.Text), int.Parse(MinuteTextbox.Text), int.Parse(SecondTextbox.Text));
