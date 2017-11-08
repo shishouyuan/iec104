@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GuiZhou104"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         >
@@ -91,11 +92,54 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="总召唤">
-
+            <TabItem Header="单召唤">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Column="0" Text="信息体地址"/>
+                    <TextBox VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="20" Name="rd_MsgAddrTextbox" Text="1" Grid.Column="1"/>
+                    <Button Name="rd_sendBtn" Content="发送" Click="rd_sendBtn_Click" Grid.Column="2"/>
+                </Grid>
             </TabItem>
-            <TabItem Header="。。。">
+            <TabItem Header="总/组召唤">
+                <Grid>
+                    <Grid.Resources>
+                        <x:Array x:Key="ic_groups" Type="sys:String">
+                            <sys:String>全站</sys:String>
+                            <sys:String>第1组</sys:String>
+                            <sys:String>第2组</sys:String>
+                            <sys:String>第3组</sys:String>
+                            <sys:String>第4组</sys:String>
+                            <sys:String>第5组</sys:String>
+                            <sys:String>第6组</sys:String>
+                            <sys:String>第7组</sys:String>
+                            <sys:String>第8组</sys:String>
+                            <sys:String>第9组</sys:String>
+                            <sys:String>第10组</sys:String>
+                            <sys:String>第11组</sys:String>
+                            <sys:String>第12组</sys:String>
+                            <sys:String>第13组</sys:String>
+                            <sys:String>第14组</sys:String>
+                            <sys:String>第15组</sys:String>
+                            <sys:String>第16组</sys:String>
+                        </x:Array>
+                    </Grid.Resources>
 
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Column="0" Text="召唤范围"/>
+                    <ComboBox Name="ic_groupCombobox" Grid.Column="1" VerticalContentAlignment="Center" FontSize="15" SelectedIndex="0" ItemsSource="{StaticResource ResourceKey=ic_groups}"/>
+                    <Button Name="ic_SendBtn" Content="发送" Click="ic_sendBtn_Click" Grid.Column="2"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="...">
+                
             </TabItem>
         </TabControl>
     </Grid>

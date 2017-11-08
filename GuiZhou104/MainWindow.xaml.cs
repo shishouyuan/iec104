@@ -58,14 +58,14 @@ namespace GuiZhou104
             node.DatagramSending += Node_DatagramSending;
             node.ConnectionLost += Node_ConnectionLost;
             this.WindowStyle = WindowStyle.None;
-            this.ResizeMode = ResizeMode.CanResizeWithGrip;
-            this.AllowsTransparency = true;
-            this.BorderThickness = new Thickness(0);
+            //this.ResizeMode = ResizeMode.CanResizeWithGrip;
+            //this.AllowsTransparency = true;
+            //this.BorderThickness = new Thickness(0);
 
-            this.OpacityMask = new LinearGradientBrush(Color.FromArgb(255, 0, 0, 0), Color.FromArgb(220, 0, 0, 0), 0) { Transform = trans };
+            //this.OpacityMask = new LinearGradientBrush(Color.FromArgb(255, 0, 0, 0), Color.FromArgb(220, 0, 0, 0), 0) { Transform = trans };
 
-            var ani = new System.Windows.Media.Animation.DoubleAnimation() { From = 0, To = 360, Duration = TimeSpan.FromSeconds(8), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever };
-            trans.BeginAnimation(RotateTransform.AngleProperty, ani);
+            //var ani = new System.Windows.Media.Animation.DoubleAnimation() { From = 0, To = 360, Duration = TimeSpan.FromSeconds(8), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever };
+            //trans.BeginAnimation(RotateTransform.AngleProperty, ani);
 
             this.MouseDown += ((object b, MouseButtonEventArgs a) =>
             {
@@ -206,7 +206,7 @@ namespace GuiZhou104
                                     {
                                         p.Inlines.Add(new Run("信息体") { Foreground = Brushes.Gray });
                                         p.Inlines.Add(new Run(i.Type.ToString()) { Foreground = Brushes.Blue });
-                                        p.Inlines.Add(new Run("，地址") { Foreground = Brushes.Gray });
+                                        p.Inlines.Add(new Run("，地址：") { Foreground = Brushes.Gray });
                                         p.Inlines.Add(new Run(i.Address.ToString()) { Foreground = Brushes.Blue });
                                         if (i.Type != ElementType.Empty)
                                         {
@@ -223,6 +223,13 @@ namespace GuiZhou104
                                                     p.Inlines.Add(new Run(i.SVA.ToString()) { Foreground = Brushes.Blue });
                                                     break;
                                             }
+                                        }
+                                        if(i.Extra!=null)
+                                        {
+                                            p.Inlines.Add(new Run("，附加信息：") { Foreground = Brushes.Gray });
+                                            if (d.Formatter != null && d.Formatter.GetType() == typeof(C_IC_NA_1))
+                                                p.Inlines.Add(new Run("召唤" + (i.QOI == Message.QOI_WholeStation ? "全站" : "第" + (i.QOI - Message.QOI_WholeStation).ToString() + "组")) { Foreground = Brushes.Blue });
+                                            break;
                                         }
                                         if (i.TimeStamp != null && i.TimeStamp.Length == 7)
                                         {
@@ -418,12 +425,12 @@ namespace GuiZhou104
 
         }
 
-        APDU tosend;
+        APDU metf_tosend;
         private void addValueButton_Click(object sender, RoutedEventArgs e)
         {
             var f = (M_ME_TF_1)node.FormatterManager.GetInstance(typeof(M_ME_TF_1));
-            if (tosend == null)
-                tosend = f.CreateAPDU(1);
+            if (metf_tosend == null)
+                metf_tosend = f.CreateAPDU(1);
             try
             {
                 var t = DateTime.Now;
@@ -433,7 +440,7 @@ namespace GuiZhou104
                     t = new DateTime(t.Year, t.Month, t.Day, int.Parse(HourTextbox.Text), int.Parse(MinuteTextbox.Text), int.Parse(SecondTextbox.Text));
                 }
 
-                f.PutData(tosend, Convert.ToSingle(valTextbox.Text), t, Convert.ToUInt32(MsgAddrTextbox.Text));
+                f.PutData(metf_tosend, Convert.ToSingle(valTextbox.Text), t, Convert.ToUInt32(MsgAddrTextbox.Text));
             }
             catch (Exception er) { }
 
@@ -441,11 +448,11 @@ namespace GuiZhou104
 
         private void sendValueButton_Click(object sender, RoutedEventArgs e)
         {
-            if (tosend == null) addValueButton_Click(null, null);
-            if (tosend != null)
+            if (metf_tosend == null) addValueButton_Click(null, null);
+            if (metf_tosend != null)
             {
-                node.SendAPDU(tosend);
-                tosend = null;
+                node.SendAPDU(metf_tosend);
+                metf_tosend = null;
             }
         }
 
@@ -470,6 +477,31 @@ namespace GuiZhou104
         {
             toDisconnect = true;
             node.CloseConnection();
+        }
+
+
+        private void rd_sendBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var f = (C_RD_NA_1)node.FormatterManager.GetInstance(typeof(C_RD_NA_1));
+                var apdu = f.Create(1, byte.Parse(rd_MsgAddrTextbox.Text));
+                node.SendAPDU(apdu);
+
+            }
+            catch (Exception) { }
+        }
+
+        private void ic_sendBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var f = (C_IC_NA_1)node.FormatterManager.GetInstance(typeof(C_IC_NA_1));
+                var apdu = f.Create(1, (byte)ic_groupCombobox.SelectedIndex);
+                node.SendAPDU(apdu);
+
+            }
+            catch (Exception) { }
         }
     }
 }
