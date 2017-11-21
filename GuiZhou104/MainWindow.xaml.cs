@@ -224,12 +224,13 @@ namespace GuiZhou104
                                                     break;
                                             }
                                         }
-                                        if(i.Extra!=null)
+                                        if (i.Extra != null)
                                         {
-                                            p.Inlines.Add(new Run("，附加信息：") { Foreground = Brushes.Gray });
                                             if (d.Formatter != null && d.Formatter.GetType() == typeof(C_IC_NA_1))
+                                            {
+                                                p.Inlines.Add(new Run("，附加信息：") { Foreground = Brushes.Gray });
                                                 p.Inlines.Add(new Run("召唤" + (i.QOI == Message.QOI_WholeStation ? "全站" : "第" + (i.QOI - Message.QOI_WholeStation).ToString() + "组")) { Foreground = Brushes.Blue });
-                                            break;
+                                            }
                                         }
                                         if (i.TimeStamp != null && i.TimeStamp.Length == 7)
                                         {
@@ -334,7 +335,14 @@ namespace GuiZhou104
                                     DisplayMsg("正在尝试连接" + remoteAddr + "，目标端口" + remotePort);
                                     s.Connect(remoteAddr, remotePort);
                                     node.BindSocket(s);
-                                    DisplayMsg("新连接已建立，对方位于" + node.Socket.RemoteEndPoint.ToString());
+                                    var ip = node.Socket.RemoteEndPoint as IPEndPoint;
+                                    if (ip != null)
+                                    {
+                                        var addr = ip.Address;
+                                        if (addr.IsIPv4MappedToIPv6)
+                                            addr = addr.MapToIPv4();
+                                        DisplayMsg("新连接已建立，对方位于" + addr.ToString() + ":" + ip.Port);
+                                    }
                                     node.StartReceive();
                                 }
                                 catch (Exception)
@@ -370,6 +378,7 @@ namespace GuiZhou104
 
         void StartAccept()
         {
+
             System.Threading.ThreadPool.QueueUserWorkItem((object o) =>
             {
                 lock (node)
@@ -387,7 +396,15 @@ namespace GuiZhou104
                             listenSocket.Bind(new IPEndPoint(0, localPort));
                             listenSocket.Listen(1);
                             node.BindSocket(listenSocket.Accept());
-                            DisplayMsg("新连接已建立，对方位于" + node.Socket.RemoteEndPoint.ToString());
+                            var ip = node.Socket.RemoteEndPoint as IPEndPoint;
+                            if (ip != null)
+                            {
+                                var addr = ip.Address;
+                                if (addr.IsIPv4MappedToIPv6)
+                                    addr = addr.MapToIPv4();
+                                DisplayMsg("新连接已建立，对方位于" + addr.ToString() + ":" + ip.Port);
+                            }
+
                             node.StartReceive();
                             listenSocket.Dispose();
                             listenSocket = null;
@@ -418,7 +435,7 @@ namespace GuiZhou104
                     ipTextbox.AppendText("|");
                 }
                 remoteAddr = "localhost";
-                remotePort = int.Parse(portTextbox.Text);
+                localPort = int.Parse(portTextbox.Text);
                 StartAccept();
             }
             catch (Exception) { }
@@ -448,8 +465,9 @@ namespace GuiZhou104
 
         private void sendValueButton_Click(object sender, RoutedEventArgs e)
         {
-            if (metf_tosend == null) addValueButton_Click(null, null);
-            if (metf_tosend != null)
+            if (metf_tosend == null)
+                addValueButton_Click(null, null);
+            else
             {
                 node.SendAPDU(metf_tosend);
                 metf_tosend = null;
