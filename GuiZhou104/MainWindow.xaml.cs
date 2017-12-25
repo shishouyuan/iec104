@@ -161,7 +161,7 @@ namespace GuiZhou104
                             var p = new Paragraph() { Margin = new Thickness(5) };
                             var t = d.TransferTime;
                             p.Inlines.Add(new Run(string.Format("{0}-{1}-{2} {3:d2}:{4:d2}:{5:d2}.{6:d3} {7}",
-                                t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, t.Millisecond, rev ? "接收" : "发送"))
+                                t.Year, t.Month, t.Day, t.Hour, t.Minute, t.Second, t.Millisecond, di.rev ? "接收" : "发送"))
                             { Foreground = di.rev ? Brushes.DarkBlue : Brushes.Brown });
 
                             p.Inlines.Add(new LineBreak());
