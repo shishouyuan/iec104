@@ -467,11 +467,10 @@ namespace GuiZhou104
         {
             if (metf_tosend == null)
                 addValueButton_Click(null, null);
-            else
-            {
-                node.SendAPDU(metf_tosend);
-                metf_tosend = null;
-            }
+
+            node.SendAPDU(metf_tosend);
+            metf_tosend = null;
+
         }
 
         private void minBtn_Click(object sender, RoutedEventArgs e)
