@@ -45,7 +45,7 @@ namespace Shouyuan.IEC104
         private ushort lastSendVR;
         private DateTime lastSentTime;
         private DateTime lastUISentTime;
-
+        public bool IsMaster { get; set; }
         public delegate void NewDatagramEventHandler(APDU d, Node sender);
         public event NewDatagramEventHandler NewDatagram;
 
@@ -158,7 +158,7 @@ namespace Shouyuan.IEC104
 
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 CloseConnection();
             }
@@ -183,7 +183,10 @@ namespace Shouyuan.IEC104
                 throw new Exception("尚未绑定Socket。");
             if (running) return;
             init();
+            if (IsMaster)
+                SendUDatagram(ControlFunction.STARTDT_C);
             running = true;
+
             ThreadPool.QueueUserWorkItem(ReceiveLoop);
         }
 
@@ -207,10 +210,11 @@ namespace Shouyuan.IEC104
         {
             timer.Elapsed += TimerLoop;
         }
-        public void BindSocket(Socket s)
+        public void BindSocket(Socket s, bool isMaster)
         {
             socket = s;
             lastRevTime = DateTime.Now;
+            IsMaster = isMaster;
             timer.Start();
         }
 

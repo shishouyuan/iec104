@@ -17,7 +17,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Globalization;
 
-namespace GuiZhou104
+namespace Shouyuan.IEC104.DemoUI
 {
 
     public class Conv : IValueConverter
@@ -244,6 +244,8 @@ namespace GuiZhou104
                                             p.Inlines.Add(new Run(i.DayInWeek.ToString()) { Foreground = Brushes.Blue });
                                             p.Inlines.Add(new Run(string.Format("，{0:d2}:{1:d2}:{2:d2}.{3:d3}\n", i.Hour, i.Minute, i.Second, i.Milisecond)) { Foreground = Brushes.Blue });
                                         }
+
+                                        p.Inlines.Add(new LineBreak());
                                     }
                                     break;
                             }
@@ -334,7 +336,7 @@ namespace GuiZhou104
                                     var s = new Socket(SocketType.Stream, ProtocolType.Tcp);
                                     DisplayMsg("正在尝试连接" + remoteAddr + "，目标端口" + remotePort);
                                     s.Connect(remoteAddr, remotePort);
-                                    node.BindSocket(s);
+                                    node.BindSocket(s, true);
                                     var ip = node.Socket.RemoteEndPoint as IPEndPoint;
                                     if (ip != null)
                                     {
@@ -395,7 +397,7 @@ namespace GuiZhou104
                             listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
                             listenSocket.Bind(new IPEndPoint(0, localPort));
                             listenSocket.Listen(1);
-                            node.BindSocket(listenSocket.Accept());
+                            node.BindSocket(listenSocket.Accept(),false);
                             var ip = node.Socket.RemoteEndPoint as IPEndPoint;
                             if (ip != null)
                             {
@@ -459,7 +461,7 @@ namespace GuiZhou104
 
                 f.PutData(metf_tosend, Convert.ToSingle(valTextbox.Text), t, Convert.ToUInt32(MsgAddrTextbox.Text));
             }
-            catch (Exception er) { }
+            catch (Exception) { }
 
         }
 
@@ -502,7 +504,7 @@ namespace GuiZhou104
             try
             {
                 var f = (C_RD_NA_1)node.FormatterManager.GetInstance(typeof(C_RD_NA_1));
-                var apdu = f.Create(1, byte.Parse(rd_MsgAddrTextbox.Text));
+                var apdu = f.Create(1, uint.Parse(rd_MsgAddrTextbox.Text));
                 node.SendAPDU(apdu);
 
             }

@@ -18,7 +18,7 @@ namespace Shouyuan.IEC104
 
         }
 
-        public APDU Create(byte asduaddr, byte msgAddr, byte cot = 5)
+        public APDU Create(byte asduaddr, uint msgAddr, byte cot = 5)
         {
             var apdu = CreateAPDU(asduaddr);
             apdu.ASDU.Cause = cot;

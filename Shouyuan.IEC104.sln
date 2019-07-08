@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiZhou104", "GuiZhou104\GuiZhou104.csproj", "{E487B147-ECA4-4383-9B4E-FDACEFCA0ECA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoUI", "DemoUI\DemoUI.csproj", "{E487B147-ECA4-4383-9B4E-FDACEFCA0ECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IEC104", "IEC104\IEC104.csproj", "{BB89B73A-735E-426C-9BC7-65E0BEE15187}"
 EndProject

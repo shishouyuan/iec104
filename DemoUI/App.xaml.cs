@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace GuiZhou104
+namespace Shouyuan.IEC104.DemoUI
 {
     /// <summary>
     /// App.xaml 的交互逻辑

@@ -1,7 +1,7 @@
-﻿<Application x:Class="GuiZhou104.App"
+﻿<Application x:Class="Shouyuan.IEC104.DemoUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:GuiZhou104"
+             xmlns:local="clr-namespace:Shouyuan.IEC104.DemoUI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
