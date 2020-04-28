@@ -245,7 +245,7 @@ namespace Shouyuan.IEC104.DemoUI
                                             p.Inlines.Add(new Run(string.Format("，{0:d2}:{1:d2}:{2:d2}.{3:d3}\n", i.Hour, i.Minute, i.Second, i.Milisecond)) { Foreground = Brushes.Blue });
                                         }
 
-                                        p.Inlines.Add(new LineBreak());
+                                        //p.Inlines.Add(new LineBreak());
                                     }
                                     break;
                             }
@@ -395,9 +395,9 @@ namespace Shouyuan.IEC104.DemoUI
                                 listenSocket.Dispose();
                             DisplayMsg("服务建立于端口" + localPort + "，正在等待连接...");
                             listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                            listenSocket.Bind(new IPEndPoint(0, localPort));
+                            listenSocket.Bind(new IPEndPoint(IPAddress.IPv6Any, localPort));
                             listenSocket.Listen(1);
-                            node.BindSocket(listenSocket.Accept(),false);
+                            node.BindSocket(listenSocket.Accept(), false);
                             var ip = node.Socket.RemoteEndPoint as IPEndPoint;
                             if (ip != null)
                             {
