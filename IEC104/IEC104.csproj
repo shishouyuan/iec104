@@ -6,6 +6,7 @@
     <AssemblyName>Shouyuan.IEC104</AssemblyName>
     <ApplicationIcon />
     <OutputType>Library</OutputType>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
 </Project>
